@@ -29,7 +29,6 @@ public class MainActivity extends AppCompatActivity implements OnGetCurrentDateT
     private MeetingAdapter adapter ;
     private TextView timeTv,dataTv;
     private DateTimeUtil dateTimeUtil;
-    private int weaid = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

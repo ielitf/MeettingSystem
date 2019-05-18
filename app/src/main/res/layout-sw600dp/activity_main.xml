@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/com_logo_top" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_margin="1dp"
+                android:layout_weight="1"
+                android:background="@color/back"
+                android:gravity="center"
+                android:text="301会议室"
+                android:textColor="@color/white"
+                android:textSize="40sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_margin="1dp"
+                android:layout_weight="1.5"
+                android:background="@color/back"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="新产品发布会"
+                    android:textColor="@color/white"
+                    android:textSize="30sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="10:00-11:30  市场部"
+                    android:textColor="@color/white"
+                    android:textSize="20sp" />
+
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_margin="1dp"
+                android:layout_weight="1.8"
+                android:scaleType="fitXY"
+                android:src="@drawable/laishui" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.5"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_margin="1dp"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="1dp"
+                    android:layout_weight="2.5"
+                    android:background="@color/back"
+                    android:orientation="horizontal"
+                    >
+
+                    <TextView
+                        android:layout_height="match_parent"
+                        android:layout_width="0dp"
+                        android:layout_weight="2"
+                        android:gravity="center_vertical"
+                        android:text="会议列表"
+                        android:layout_marginLeft="@dimen/px50_dp"
+                        android:textColor="@color/white"
+                        android:textSize="35sp"
+                        />
+                    <TextView
+                        android:layout_height="match_parent"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_marginBottom="@dimen/px40_dp"
+                        android:gravity="bottom|center_horizontal"
+                        android:text="conference list"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="1dp"
+                    android:layout_weight="1"
+                    android:background="@color/back"
+                    android:orientation="vertical"
+                    >
+
+                    <TextView
+                        android:id="@+id/time"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/px30_dp"
+                        android:gravity="center"
+                        android:text="11:20:42"
+                        android:textSize="@dimen/px50_dp"
+                        android:textColor="@color/white"
+                        />
+                    <TextView
+                        android:id="@+id/data"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/px15_dp"
+                        android:gravity="center"
+                        android:text="2019/07/24     星期五"
+                        android:textSize="@dimen/px30_dp"
+                        android:textColor="@color/white"
+                        />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_margin="1dp"
+                android:layout_weight="3.3"
+                android:background="@color/back"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/meeting_item_navigation"
+                        android:layout_weight="1"
+                        android:text="日期" />
+
+                    <TextView
+                        style="@style/meeting_item_navigation"
+                        android:layout_weight="1"
+                        android:text="时期" />
+
+                    <TextView
+                        style="@style/meeting_item_navigation"
+                        android:layout_weight="2"
+                        android:text="会议主题" />
+
+                    <TextView
+                        style="@style/meeting_item_navigation"
+                        android:layout_weight="1"
+                        android:text="预订人" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0.1dp"
+                    android:background="#888888" />
+
+                <ListView
+                    android:id="@+id/meeting_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"></ListView>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

@@ -2,7 +2,6 @@ package com.hskj.meettingsys;
 
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,6 +9,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
 import com.hskj.meettingsys.K780.K780Utils;
 import com.hskj.meettingsys.ui.DateTimeUtil;
 import com.hskj.meettingsys.ui.MeetingAdapter;
@@ -18,13 +18,16 @@ import com.hskj.meettingsys.ui.MeetingItemBean;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.cache.CacheMode;
 import com.lzy.okgo.callback.StringCallback;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
+
 import okhttp3.Call;
 import okhttp3.Response;
 
-public class MainActivity extends AppCompatActivity implements OnGetCurrentDateTimeListener, OnGetMQTTMessageListener, IGetMessageCallBack {
+public class MainActivity2 extends AppCompatActivity implements OnGetCurrentDateTimeListener, OnGetMQTTMessageListener, IGetMessageCallBack {
     private ListView meeting_list;
     private ArrayList<MeetingItemBean> list = new ArrayList<>();
     private MeetingAdapter adapter;
@@ -39,16 +42,22 @@ public class MainActivity extends AppCompatActivity implements OnGetCurrentDateT
     private MyMessageTask myMessageTask;
     private static  boolean getMessage;
 
+//    private MqttConfiguration mqttConfiguration = new MqttConfiguration();
+//    private MqttPushClient mqttPushClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main2);
         getMessage = true;
-        Log.i("=====onCreate1", "onCreate1");
+        Log.i("=====onCreate2", "onCreate2");
         serviceConnection = new MyServiceConnection();
-        serviceConnection.setIGetMessageCallBack(MainActivity.this);
+        serviceConnection.setIGetMessageCallBack(MainActivity2.this);
+//        Intent intent = new Intent(this, MQTTService.class);
+//        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
         initViews();
         initdata();
+
         dateTimeUtil = DateTimeUtil.getInstance();
         timeThreadUtil = new TimeThread(this);
         timeThreadUtil.start();
@@ -69,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements OnGetCurrentDateT
             @Override
             public void onClick(View v) {
                 finish();
-                Intent intent = new Intent(MainActivity.this, Main3Activity.class);
+                Intent intent = new Intent(MainActivity2.this, MainActivity.class);
                 startActivity(intent);
             }
         });
@@ -126,20 +135,25 @@ public class MainActivity extends AppCompatActivity implements OnGetCurrentDateT
         dataTv.setText(dateTimeUtil.getCurrentDate() + "\t\t" + dateTimeUtil.getCurrentWeekDay(0));//显示年月日
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+    }
 
     @Override
     protected void onDestroy() {
-        Log.i("=====onDestroy1", "onDestroy1");
+        Log.i("=====onDestroy2", "onDestroy2");
 //        unbindService(serviceConnection);
         myMessageTask.cancel(true);
         myMessageTask = null;
         getMessage = false;
         super.onDestroy();
+
     }
 
     @Override
     public void setMessage(String message) {
-        Log.i("=====收到的message11：", "MainActivity11+setMessage:" + message);
+        Log.i("=====收到的message22：", "MainActivity22+setMessage:" + message);
         mqttService = serviceConnection.getMqttService();
         mqttService.toCreateNotification(message);
 
@@ -152,6 +166,7 @@ public class MainActivity extends AppCompatActivity implements OnGetCurrentDateT
     private class MyMessageTask extends AsyncTask<String, String, String> {
         @Override
         protected void onPreExecute() {
+//            mqttManager.connect();
         }
 
         @Override

@@ -1,4 +1,4 @@
-package com.hskj.meettingsys;
+package com.hskj.meettingsys.ui;
 
 public class MeetingData {
     public static String[] meeting_data_day = new String[]{

@@ -1,4 +1,4 @@
-package com.hskj.meettingsys;
+package com.hskj.meettingsys.ui;
 
 import android.content.Context;
 import android.view.View;

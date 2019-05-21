@@ -24,17 +24,17 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 public class MQTTService extends Service {
 
-    public static final String TAG = MQTTService.class.getSimpleName();
+    public static final String TAG = "=====";
 
     private static MqttAndroidClient client;
     private MqttConnectOptions conOpt;
 
-    private String host = "tcp://127.0.0.1:1883";
+    private String host = "tcp://172.16.30.226:1883";
     private String clientId = "zhanghao66666666";//客户端标识
-    private String userName = "guest";
-    private String passWord = "guest";
+    private String userName = "easton";
+    private String passWord = "easton";
     private static String myTopic = "zhanghaoTopic";      //要订阅的主题
-    private IGetMessageCallBack IGetMessageCallBack;
+    private IGetMessageCallBack iGetMessageCallBack;
 
 
     @Override
@@ -71,7 +71,7 @@ public class MQTTService extends Service {
         // 设置超时时间，单位：秒
         conOpt.setConnectionTimeout(10);
         // 心跳包发送间隔，单位：秒
-        conOpt.setKeepAliveInterval(20);
+        conOpt.setKeepAliveInterval(10);
         // 用户名
         conOpt.setUserName(userName);
         // 密码
@@ -80,7 +80,7 @@ public class MQTTService extends Service {
         // last will message
         boolean doConnect = true;
         String message = "{\"terminal_uid\":\"" + clientId + "\"}";
-        Log.e(getClass().getName(), "====message是:" + message);
+        Log.e(getClass().getName(), "====terminal_uid:" + message);
         String topic = myTopic;
         Integer qos = 0;
         Boolean retained = false;
@@ -148,6 +148,7 @@ public class MQTTService extends Service {
             arg1.printStackTrace();
             // 连接失败，重连
             Log.i(TAG, "===连接失败=== ");
+            init();
         }
     };
 
@@ -156,10 +157,10 @@ public class MQTTService extends Service {
 
         @Override
         public void messageArrived(String topic, MqttMessage message) throws Exception {
-
+            Log.i(TAG, "===iGetMessageCallBack===:" + iGetMessageCallBack);
             String str1 = new String(message.getPayload());
-            if (IGetMessageCallBack != null){
-                IGetMessageCallBack.setMessage(str1);
+            if (iGetMessageCallBack != null){
+                iGetMessageCallBack.setMessage(str1);
             }
             String str2 = topic + ";qos:" + message.getQos() + ";retained:" + message.isRetained();
             Log.i(TAG, "===messageArrived===:" + str1);
@@ -175,6 +176,7 @@ public class MQTTService extends Service {
         public void connectionLost(Throwable arg0) {
             // 失去连接，重连
             Log.i(TAG, "===失去连接=== ");
+            init();
         }
     };
 
@@ -200,8 +202,8 @@ public class MQTTService extends Service {
         return new CustomBinder();
     }
 
-    public void setIGetMessageCallBack(IGetMessageCallBack IGetMessageCallBack){
-        this.IGetMessageCallBack = IGetMessageCallBack;
+    public void setIGetMessageCallBack(IGetMessageCallBack iGetMessageCallBack){
+        this.iGetMessageCallBack = iGetMessageCallBack;
     }
 
     public class CustomBinder extends Binder {
@@ -226,6 +228,5 @@ public class MQTTService extends Service {
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         startForeground(0, notification);
         notificationManager.notify(0, notification);
-
     }
 }

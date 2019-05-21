@@ -1,9 +1,11 @@
-package com.hskj.meettingsys;
+package com.hskj.meettingsys.ui;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+
+import com.hskj.meettingsys.MainActivity;
 
 public class BootCompleteReceiver extends BroadcastReceiver {
 

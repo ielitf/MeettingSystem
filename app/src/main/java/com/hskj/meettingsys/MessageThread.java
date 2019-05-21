@@ -3,11 +3,11 @@ package com.hskj.meettingsys;
 import android.os.Handler;
 import android.os.Message;
 
-public class TimeThreadUtil extends Thread {
+public class MessageThread extends Thread {
 
-  private static final int CURRENTDATETIME = 1;
-  private static TimeThreadUtil timeThreadUtil;
-  private OnGetCurrentDateTimeListener listener;
+  private static final int CURRENTDATETIME = 111;
+  private static MessageThread messageThread;
+  private OnGetMQTTMessageListener listener;
 
   private Handler mHandler = new Handler() {
     @Override
@@ -16,14 +16,14 @@ public class TimeThreadUtil extends Thread {
       switch (msg.what) {
         case CURRENTDATETIME:
           if (listener !=null){
-            listener.onGetDateTime();
+            listener.onGetMQTTMessage();
           }
           break;
       }
     }
   };
 
-  public TimeThreadUtil(OnGetCurrentDateTimeListener listener) {
+  public MessageThread(OnGetMQTTMessageListener listener) {
 
     this.listener = listener;
   }
@@ -34,7 +34,7 @@ public class TimeThreadUtil extends Thread {
     super.run();
     do {
       try {
-        Thread.sleep(1000);
+        Thread.sleep(10000);
         Message msg = new Message();
         msg.what = CURRENTDATETIME;
         mHandler.sendMessage(msg);

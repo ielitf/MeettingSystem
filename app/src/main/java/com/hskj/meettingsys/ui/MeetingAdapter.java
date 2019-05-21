@@ -1,10 +1,13 @@
-package com.hskj.meettingsys;
+package com.hskj.meettingsys.ui;
 
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.hskj.meettingsys.R;
+
 import java.util.ArrayList;
 
 public class MeetingAdapter extends MyBaseAdapter<MeetingItemBean> {

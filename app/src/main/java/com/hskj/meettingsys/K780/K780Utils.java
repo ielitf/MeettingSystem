@@ -1,6 +1,6 @@
 package com.hskj.meettingsys.K780;
 
-import com.hskj.meettingsys.HttpUtils;
+import com.hskj.meettingsys.ui.HttpUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -10,10 +10,11 @@ import org.json.JSONObject;
  */
 public class K780Utils {
 
+	public static final String host = "http://api.k780.com/?app=weather.today";
 	public static final String weaid = "1";
 	public static final String APPKEY = "42583";
 	public static final String SIGN = "7cb438dc230ebed6e14d34b9a5f0cfaa";
-	public static final String WEATHER_URL ="http://api.k780.com:88/?app=weather.today"
+	public static final String WEATHER_URL = host
 			+ "&weaid="+ weaid
 			+ "&appkey=" + APPKEY
 			+ "&sign=" + SIGN
@@ -25,7 +26,7 @@ public class K780Utils {
 	 * weaid = 1，北京
 	 */
 	public static Weather getOneDayWeather(int weaid) {
-		String spec = "http://api.k780.com:88/?app=weather.today"
+		String spec = "http://api.k780.com/?app=weather.today"
 				+ "&weaid="+ weaid 
 				+ "&appkey=" + APPKEY
 				+ "&sign=" + SIGN

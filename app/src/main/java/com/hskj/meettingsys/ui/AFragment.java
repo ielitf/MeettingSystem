@@ -1,8 +1,6 @@
 package com.hskj.meettingsys.ui;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,11 +13,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.hskj.meettingsys.IGetMessageCallBack;
-import com.hskj.meettingsys.MQTTService;
-import com.hskj.meettingsys.Main3Activity;
-import com.hskj.meettingsys.MainActivity;
 import com.hskj.meettingsys.MqttManager;
-import com.hskj.meettingsys.MyServiceConnection;
 import com.hskj.meettingsys.OnGetCurrentDateTimeListener;
 import com.hskj.meettingsys.OnGetMQTTMessageListener;
 import com.hskj.meettingsys.R;

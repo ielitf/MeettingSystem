@@ -2,7 +2,6 @@ package com.hskj.meettingsys;
 
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -69,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements OnGetCurrentDateT
             @Override
             public void onClick(View v) {
                 finish();
-                Intent intent = new Intent(MainActivity.this, Main3Activity.class);
+                Intent intent = new Intent(MainActivity.this, MainActivity3.class);
                 startActivity(intent);
             }
         });

@@ -6,6 +6,9 @@
 
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
-    <color name="back">#44415E5A</color>
+    <color name="back">#44373637</color>
+    <color name="back2">#44415E5A</color>
     <color name="transparent">#00000000</color>
+
+
 </resources>

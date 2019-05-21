@@ -12,8 +12,6 @@ import com.hskj.meettingsys.ui.DateTimeUtil;
 import com.hskj.meettingsys.ui.MeetingAdapter;
 import com.hskj.meettingsys.ui.MeetingData;
 import com.hskj.meettingsys.ui.MeetingItemBean;
-import com.ibm.mqtt.Mqtt;
-import com.ibm.mqtt.MqttSubscribe;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.cache.CacheMode;
 import com.lzy.okgo.callback.StringCallback;
@@ -45,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements OnGetCurrentDateT
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main2);
         serviceConnection = new MyServiceConnection();
         serviceConnection.setIGetMessageCallBack(MainActivity.this);
 //        Intent intent = new Intent(this, MQTTService.class);

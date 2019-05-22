@@ -70,7 +70,6 @@ public class AFragment extends Fragment implements OnGetCurrentDateTimeListener{
                              Bundle savedInstanceState) {
         convertView = inflater.inflate(R.layout.fragment_form_a, container, false);
         context = getActivity();
-
         initViews(convertView);
         initdata();
         dateTimeUtil = DateTimeUtil.getInstance();
@@ -93,18 +92,15 @@ public class AFragment extends Fragment implements OnGetCurrentDateTimeListener{
         meeting_list.setAdapter(adapter);
     }
 
-
     @Override
     public void onGetDateTime() {
         timeTv.setText(dateTimeUtil.getCurrentTime());//显示时间
         dataTv.setText(dateTimeUtil.getCurrentDate() + "\t\t" + dateTimeUtil.getCurrentWeekDay(0));//显示年月日
     }
 
-
     @Override
     public void onDestroy() {
         Log.i("=====onDestroyaaaaaaa", "onDestroyaaaaaaa");
         super.onDestroy();
     }
-
 }

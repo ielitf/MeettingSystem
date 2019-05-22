@@ -13,10 +13,13 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSON;
 import com.hskj.meettingsys.K780.K780Utils;
 import com.hskj.meettingsys.R;
+import com.hskj.meettingsys.bean.MqttMeetingListBean;
 import com.hskj.meettingsys.listener.CallBack;
 import com.hskj.meettingsys.utils.MqttService;
+import com.hskj.meettingsys.utils.SharePreferenceManager;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.cache.CacheMode;
 import com.lzy.okgo.callback.StringCallback;
@@ -24,6 +27,7 @@ import com.lzy.okgo.callback.StringCallback;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.Call;
@@ -38,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements CallBack {
     private TextView ceshi;
     private int kk;
     private boolean aBoolean = false;
+    private List<MqttMeetingListBean> list = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +83,15 @@ public class MainActivity extends AppCompatActivity implements CallBack {
     public void setData(String topic,String strMessage) {
         Log.i("============","topic:"+topic+"----strMessage:"+strMessage);
         FragmentTransaction transaction = manager.beginTransaction();
+        if("002_meetList".equals(topic)){
+            //todo   会议列表
+            SharePreferenceManager.setMeetingTodayData(strMessage);
+        }
+        if("".equals(topic)){
+            //todo   根据模板id显示相应的模板
+            SharePreferenceManager.setMeetingCurrentData(strMessage);
+        }
+        list = JSON.parseArray(strMessage, MqttMeetingListBean.class);
         transaction.replace(R.id.viewPager,BFragment.newInstance("B这是主题B","B这是消息内容B")).commit();
 
     }

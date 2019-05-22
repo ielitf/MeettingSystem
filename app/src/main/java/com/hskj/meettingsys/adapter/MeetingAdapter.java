@@ -34,10 +34,10 @@ public class MeetingAdapter extends MyBaseAdapter<MqttMeetingListBean> {
     @Override
     protected void bindView(Context context, View view, int position, MqttMeetingListBean model) {
         ViewHolder holderView = (ViewHolder) view.getTag();
-//        holderView.day.setText(model.getDay());
-//        holderView.hour.setText(model.getHour());
-//        holderView.title.setText(model.getName());
-//        holderView.order.setText(model.getBookPerson());
+        holderView.day.setText(model.getStartDate());
+        holderView.hour.setText(model.getEndDate());
+        holderView.title.setText(model.getName());
+        holderView.order.setText(model.getBookPerson());
     }
 
     @Override

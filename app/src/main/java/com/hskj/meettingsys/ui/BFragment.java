@@ -56,6 +56,7 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener{
             topic = getArguments().getString(ARG_PARAM1);
             jsonStr = getArguments().getString(ARG_PARAM2);
             Log.i("=====BFragment收到的", "topic:" + topic +"；jsonStr:"+jsonStr);
+
         }
     }
 

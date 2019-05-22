@@ -1,4 +1,4 @@
-package com.hskj.meettingsys.ui;
+package com.hskj.meettingsys.control;
 
 import android.app.Application;
 

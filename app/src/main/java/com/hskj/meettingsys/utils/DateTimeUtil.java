@@ -1,4 +1,4 @@
-package com.hskj.meettingsys.ui;
+package com.hskj.meettingsys.utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.hskj.meettingsys.MainActivity;
-
 public class BootCompleteReceiver extends BroadcastReceiver {
 
 	@Override

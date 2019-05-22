@@ -34,6 +34,7 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/current_room_name_b"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_margin="1dp"
@@ -54,6 +55,7 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/current_meeting_name_b"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
@@ -62,6 +64,7 @@
                     android:textSize="30sp" />
 
                 <TextView
+                    android:id="@+id/current_meeting_time_bm_b"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
@@ -72,7 +75,7 @@
             </LinearLayout>
 
             <ImageView
-                android:id="@+id/action_image"
+                android:id="@+id/action_image_b"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_margin="1dp"
@@ -137,17 +140,17 @@
                     >
 
                     <TextView
-                        android:id="@+id/time"
+                        android:id="@+id/timeb"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/px30_dp"
                         android:gravity="center"
                         android:text="11:20:42"
-                        android:textSize="@dimen/px50_dp"
+                        android:textSize="@dimen/px80_dp"
                         android:textColor="@color/white"
                         />
                     <TextView
-                        android:id="@+id/data"
+                        android:id="@+id/datab"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/px15_dp"
@@ -209,7 +212,7 @@
                     android:background="#888888" />
 
                 <ListView
-                    android:id="@+id/meeting_list"
+                    android:id="@+id/meeting_listb"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"></ListView>

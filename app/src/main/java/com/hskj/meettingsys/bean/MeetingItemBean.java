@@ -1,4 +1,4 @@
-package com.hskj.meettingsys.ui;
+package com.hskj.meettingsys.bean;
 
 public class MeetingItemBean {
     private String day;

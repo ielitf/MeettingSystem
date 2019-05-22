@@ -1,19 +1,19 @@
-package com.hskj.meettingsys.ui;
+package com.hskj.meettingsys.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import com.hskj.meettingsys.R;
+import com.hskj.meettingsys.bean.MqttMeetingListBean;
 
-import java.util.ArrayList;
+import java.util.List;
 
-public class MeetingAdapter extends MyBaseAdapter<MeetingItemBean> {
+public class MeetingAdapter extends MyBaseAdapter<MqttMeetingListBean> {
     private LayoutInflater inflater;
     private Context context;
-    public MeetingAdapter(Context context, ArrayList<MeetingItemBean> mData) {
+    public MeetingAdapter(Context context, List<MqttMeetingListBean> mData) {
         super(context, mData);
         this.context = context;
         inflater = LayoutInflater.from(context);
@@ -32,12 +32,12 @@ public class MeetingAdapter extends MyBaseAdapter<MeetingItemBean> {
     }
 
     @Override
-    protected void bindView(Context context, View view, int position, MeetingItemBean model) {
+    protected void bindView(Context context, View view, int position, MqttMeetingListBean model) {
         ViewHolder holderView = (ViewHolder) view.getTag();
-        holderView.day.setText(model.getDay());
-        holderView.hour.setText(model.getHour());
-        holderView.title.setText(model.getTitle());
-        holderView.order.setText(model.getOrder());
+//        holderView.day.setText(model.getDay());
+//        holderView.hour.setText(model.getHour());
+//        holderView.title.setText(model.getName());
+//        holderView.order.setText(model.getBookPerson());
     }
 
     @Override

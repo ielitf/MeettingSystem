@@ -1,4 +1,4 @@
-package com.hskj.meettingsys;
+package com.hskj.meettingsys.listener;
 
 public interface OnGetCurrentDateTimeListener {
     void onGetDateTime();

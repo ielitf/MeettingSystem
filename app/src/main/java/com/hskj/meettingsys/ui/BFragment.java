@@ -1,7 +1,6 @@
 package com.hskj.meettingsys.ui;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -12,45 +11,40 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.hskj.meettingsys.IGetMessageCallBack;
-import com.hskj.meettingsys.MqttManager;
-import com.hskj.meettingsys.OnGetCurrentDateTimeListener;
-import com.hskj.meettingsys.OnGetMQTTMessageListener;
+import com.hskj.meettingsys.bean.MqttMeetingListBean;
+import com.hskj.meettingsys.listener.OnGetCurrentDateTimeListener;
 import com.hskj.meettingsys.R;
-import com.hskj.meettingsys.TimeThread;
+import com.hskj.meettingsys.utils.TimeThread;
+import com.hskj.meettingsys.adapter.MeetingAdapter;
+import com.hskj.meettingsys.utils.DateTimeUtil;
 
 import java.util.ArrayList;
 
-public class BFragment extends Fragment implements OnGetCurrentDateTimeListener, OnGetMQTTMessageListener, IGetMessageCallBack {
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+public class BFragment extends Fragment implements OnGetCurrentDateTimeListener{
+    private static final String ARG_PARAM1 = "topic";
+    private static final String ARG_PARAM2 = "jsonStr";
 
-    private String mParam1;
-    private String mParam2;
+    private String topic;
+    private String jsonStr;
     private View convertView;
     private Context context;
-
     private ListView meeting_list;
-    private ArrayList<MeetingItemBean> list = new ArrayList<>();
+    private ArrayList<MqttMeetingListBean> list = new ArrayList<>();
     private MeetingAdapter adapter;
-    private TextView timeTv, dataTv;
+    private TextView timeTv, dataTv,roomName,meetingName,meetingTimeBm;
     private DateTimeUtil dateTimeUtil;
-    private MqttManager mqttManager;
     private ImageView imageView;
-
-    private TimeThread timeThreadUtil;
-    private MyMessageTask myMessageTask;
-    private static  boolean getMessage;
+    private TimeThread timeThread;
 
     public BFragment() {
 
     }
 
-    public static AFragment newInstance(String param1, String param2) {
-        AFragment fragment = new AFragment();
+    public static BFragment newInstance(String topic, String jsonStr) {
+        BFragment fragment = new BFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putString(ARG_PARAM1, topic);
+        args.putString(ARG_PARAM2, jsonStr);
         fragment.setArguments(args);
         return fragment;
     }
@@ -59,8 +53,9 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            topic = getArguments().getString(ARG_PARAM1);
+            jsonStr = getArguments().getString(ARG_PARAM2);
+            Log.i("=====BFragment收到的", "topic:" + topic +"；jsonStr:"+jsonStr);
         }
     }
 
@@ -69,42 +64,24 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
                              Bundle savedInstanceState) {
         convertView = inflater.inflate(R.layout.fragment_form_b, container, false);
         context = getActivity();
-        getMessage = true;
-        Log.i("=====onCreateViewBBB", "onCreateViewBBB");
         initViews(convertView);
-        initdata();
+
         dateTimeUtil = DateTimeUtil.getInstance();
-        timeThreadUtil = new TimeThread(BFragment.this);
-        timeThreadUtil.start();
-
-        mqttManager = new MqttManager(context);
-        mqttManager.setIGetMessageCallBack(BFragment.this);
-
-        myMessageTask = new MyMessageTask();
-        myMessageTask.execute();
+        timeThread = new TimeThread(BFragment.this);
+        timeThread.start();
 
         return convertView;
     }
     private void initViews(View view) {
-        meeting_list = view.findViewById(R.id.meeting_list);
-        timeTv =view. findViewById(R.id.time);
-        dataTv = view.findViewById(R.id.data);
+        meeting_list = view.findViewById(R.id.meeting_listb);
+        timeTv =view. findViewById(R.id.timeb);
+        dataTv = view.findViewById(R.id.datab);
         imageView = view.findViewById(R.id.action_image);
+        roomName = view.findViewById(R.id.current_room_name_b);
+        meetingName = view.findViewById(R.id.current_meeting_name_b);
+        meetingTimeBm = view.findViewById(R.id.current_meeting_time_bm_b);
     }
 
-    private void initdata() {
-        for (int i = 0; i < MeetingData.meeting_data_day.length; i++) {
-            list.add(new MeetingItemBean(MeetingData.meeting_data_day[i], MeetingData.meeting_data_hour[i], MeetingData.meeting_title[i], MeetingData.meeting_order[i]));
-        }
-        adapter = new MeetingAdapter(context, list);
-        meeting_list.setAdapter(adapter);
-//        getWheatherData();
-    }
-
-    @Override
-    public void setMessage(String message) {
-        Log.i("=====收到的message11：", "BFragment+setMessage:" + message);
-    }
 
     @Override
     public void onGetDateTime() {
@@ -113,49 +90,7 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
     }
 
     @Override
-    public void onGetMQTTMessage() {
-
-    }
-
-    private class MyMessageTask extends AsyncTask<String, String, String> {
-        @Override
-        protected void onPreExecute() {
-        }
-
-        @Override
-        protected String doInBackground(String... strings) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    while (getMessage) {
-                        try {
-                            mqttManager.connect();
-                            mqttManager.subscribe("ZhangHaoTopic_ggggqqq", 0);
-                            mqttManager.publish("ZhangHaoTopic_ggggqqq", "hello mqtt111111111111", false, 0);
-                            Thread.sleep(20000);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }).start();
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-
-        }
-    }
-
-
-
-    @Override
     public void onDestroy() {
-        Log.i("=====onDestroybbbbbbb", "onDestroybbbbbbbbb");
-        myMessageTask.cancel(true);
-        myMessageTask = null;
-        getMessage = false;
         super.onDestroy();
     }
 }

@@ -1,4 +1,4 @@
-package com.hskj.meettingsys.ui;
+package com.hskj.meettingsys.utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;

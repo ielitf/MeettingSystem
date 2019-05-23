@@ -10,6 +10,22 @@ public class SharePreferenceManager {
         sp = context.getSharedPreferences(name, Context.MODE_PRIVATE);
     }
     /**
+     * 选择的会议室编号
+     */
+    private static final String MEETING_ROOM_NUM = "meeting_room_num";
+    public static void setMeetingRoomNum(int num) {
+        if (null != sp) {
+            sp.edit().putInt(MEETING_ROOM_NUM, num+1).commit();
+        }
+    }
+
+    public static int getMeetingRoomNum() {
+        if (null != sp) {
+            return sp.getInt(MEETING_ROOM_NUM, 1);
+        }
+        return 1;
+    }
+    /**
      * 当前会议数据
      */
     private static final String MEETING_CURRENT_DATA = "meeting_current_data";
@@ -22,6 +38,22 @@ public class SharePreferenceManager {
     public static String getMeetingCurrentData() {
         if (null != sp) {
             return sp.getString(MEETING_CURRENT_DATA, null);
+        }
+        return null;
+    }
+    /**
+     * 当前会议显示的模板类型
+     */
+    private static final String MEETING_MUBAN_TYPE = "meeting_mubant_type";
+    public static void setMeetingMuBanType(String jsonStr) {
+        if (null != sp) {
+            sp.edit().putString(MEETING_MUBAN_TYPE, jsonStr).commit();
+        }
+    }
+
+    public static String getMeetingMuBanType() {
+        if (null != sp) {
+            return sp.getString(MEETING_MUBAN_TYPE, null);
         }
         return null;
     }

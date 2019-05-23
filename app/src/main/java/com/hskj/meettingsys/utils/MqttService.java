@@ -13,9 +13,11 @@ import android.net.NetworkInfo;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
+
 import com.hskj.meettingsys.R;
 import com.hskj.meettingsys.listener.CallBack;
 import com.hskj.meettingsys.ui.MainActivity;
+
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -23,6 +25,7 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -32,29 +35,31 @@ import static android.content.ContentValues.TAG;
 public class MqttService extends Service {
 
     public final String clientId = "NamePlate01_Client_J_Area_1A01R11";
-//    public static final String BROKER_URL = "tcp://172.20.10.5:1883";
+    //    public static final String BROKER_URL = "tcp://172.20.10.5:1883";
 //    public static final String BROKER_URL = "http://172.16.30.185:8080/send?topic=sss&content=5555bvfnhgfh";
 //    public static final String BROKER_URL = "tcp://172.16.30.185:1883";//zzx
 //    public static final String BROKER_URL = "tcp://172.16.30.234:1883";//东东
     public static final String BROKER_URL = "tcp://172.16.30.226:1883";//浩浩
-//    public static final String TOPIC = "com.ceiv.hw.communication.rx5";//东东
-    public static final String TOPIC = "002_meetList";//浩浩
-//    private String userName = "dongdongjia";//东东
+    //    public static final String TOPIC = "com.ceiv.hw.communication.rx5";//东东
+    public static  String TOPIC_MEETING_LIST = "002_meetList";//浩浩
+    public static  String TOPIC_MEETING_CUR = "002_meetList";//浩浩
+    //    private String userName = "dongdongjia";//东东
 //    private String passWord = "dongdongjia";//东东
     private String userName = "easton";
     private String passWord = "easton";
+
+
     public MqttClient mqttClient;
     public MqttConnectOptions options;
     private ScheduledExecutorService scheduler;
     private ConnectivityManager mConnectivityManager; //网络状态监测
-    Intent intent=new Intent();
-
     private static CallBack mCallBack;
 
     public static void setCallBack(CallBack callBack) {
         mCallBack = callBack;
     }
 
+    private int roomNum;//会议室编号
 
     public MqttService() {
 
@@ -62,16 +67,32 @@ public class MqttService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+//        switch (SharePreferenceManager.getMeetingRoomNum()) {
+//            case 1:
+//                TOPIC_MEETING_LIST = "002_meetList";//浩浩
+//                TOPIC_MEETING_CUR = "002_meetList";//浩浩
+//                break;
+//            case 2:
+//                break;
+//            case 3:
+//                break;
+//            case 4:
+//                break;
+//            case 5:
+//                break;
+//            default:
+//                break;
+//        }
         Notification.Builder builder = new Notification.Builder(this.getApplicationContext()); //获取一个Notification构造器
         Intent nfIntent = new Intent(this, MainActivity.class);
         builder.setContentIntent(PendingIntent.
                 getActivity(this, 0, nfIntent, 0)) // 设置PendingIntent
-        .setLargeIcon(BitmapFactory.decodeResource(this.getResources(),
-                  R.mipmap.ic_launcher))
-        .setContentTitle("com.ceiv")
-        .setSmallIcon(R.mipmap.ic_launcher)
-        .setContentText("namePlate正在运行")
-        .setWhen(System.currentTimeMillis());
+                .setLargeIcon(BitmapFactory.decodeResource(this.getResources(),
+                        R.mipmap.ic_launcher))
+                .setContentTitle("com.ceiv")
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentText("namePlate正在运行")
+                .setWhen(System.currentTimeMillis());
         Notification notification = builder.build();
         notification.defaults = Notification.DEFAULT_SOUND;
         startForeground(110, notification);      // 开始前台服务
@@ -111,13 +132,15 @@ public class MqttService extends Service {
                         reconnectIfNecessary();
                     }
                 }
+
                 @Override
                 public void messageArrived(String topic, MqttMessage message) throws Exception {
-                    Log.i(TAG,"接收消息主题 : " + topic);
-                    Log.i(TAG,"接收消息Qos : " + message.getQos());
+                    Log.i(TAG, "接收消息主题 : " + topic);
+                    Log.i(TAG, "接收消息Qos : " + message.getQos());
                     String str = new String(message.getPayload());
-                    mCallBack.setData(topic,str);
+                    mCallBack.setData(topic, str);
                 }
+
                 @Override
                 public void deliveryComplete(IMqttDeliveryToken token) {
                     long messageId = token.getMessageId();
@@ -139,6 +162,7 @@ public class MqttService extends Service {
         NetworkInfo info = mConnectivityManager.getActiveNetworkInfo();
         return (info == null) ? false : info.isConnected();
     }
+
     /**
      * 进行重新连接前判断client状态
      */
@@ -147,6 +171,7 @@ public class MqttService extends Service {
             connect();
         }
     }
+
     /*连接服务器，并订阅消息主题*/
     private void connect() {
         new Thread(new Runnable() {
@@ -154,15 +179,16 @@ public class MqttService extends Service {
             public void run() {
                 try {
                     mqttClient.connect(options);
-                    mqttClient.subscribe(TOPIC);
+                    mqttClient.subscribe(TOPIC_MEETING_LIST);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }).start();
     }
+
     /**
-     *  调用init() 方法之后，调用此方法。
+     * 调用init() 方法之后，调用此方法。
      */
     public void startReconnect() {
         scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -173,8 +199,9 @@ public class MqttService extends Service {
                     connect();
                 }
             }
-        },0 * 1000, 10 * 1000, TimeUnit.MILLISECONDS);
+        }, 0 * 1000, 10 * 1000, TimeUnit.MILLISECONDS);
     }
+
     /**
      * 网络状态发生变化接收器
      */

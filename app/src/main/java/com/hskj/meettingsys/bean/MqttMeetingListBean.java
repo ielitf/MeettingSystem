@@ -3,7 +3,7 @@ package com.hskj.meettingsys.bean;
 public class MqttMeetingListBean {
     private String bookPerson;//预订人
     private String isOpen;//是否公开
-    private String endDate;//是否公开
+    private String endDate;
     private String name;//会议主题名称
     private int id;
     private int templateId;//

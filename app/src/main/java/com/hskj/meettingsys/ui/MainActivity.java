@@ -17,6 +17,7 @@ import com.alibaba.fastjson.JSON;
 import com.hskj.meettingsys.K780.K780Utils;
 import com.hskj.meettingsys.R;
 import com.hskj.meettingsys.bean.MqttMeetingListBean;
+import com.hskj.meettingsys.control.CodeConstants;
 import com.hskj.meettingsys.listener.CallBack;
 import com.hskj.meettingsys.utils.MqttService;
 import com.hskj.meettingsys.utils.SharePreferenceManager;
@@ -41,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements CallBack {
     private FragmentManager manager;
     private TextView ceshi;
     private int kk;
-    private boolean aBoolean = false;
+    private boolean aBoolean = true;
     private List<MqttMeetingListBean> list = new ArrayList<>();
 
     @Override
@@ -51,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements CallBack {
         if (!isServiceRunning(String.valueOf(MqttService.class))) {
             startService(new Intent(this, MqttService.class));
         }else{
-            Log.i("服务正在运行","return");
+            Log.i("===服务正在运行","return");
             return;
         }
         MqttService.setCallBack(this);
@@ -68,11 +69,11 @@ public class MainActivity extends AppCompatActivity implements CallBack {
             public void onClick(View v) {
                 FragmentTransaction transaction = manager.beginTransaction();
                 if(aBoolean){
-                    transaction.replace(R.id.viewPager,BFragment.newInstance("B这是主题B","B这是消息内容B")).commit();
-                    aBoolean = true;
+                    transaction.replace(R.id.viewPager,BFragment.newInstance("B这是主题B","B这是消息内容B","B这是消息内容B")).commit();
+                    aBoolean = false;
                 }else{
                     transaction.replace(R.id.viewPager,AFragment.newInstance("A这是主题A","A这是消息内容A")).commit();
-                    aBoolean = false;
+                    aBoolean = true;
                 }
                 kk = kk +1;
                 ceshi.setText("ceshi"+kk);
@@ -83,17 +84,31 @@ public class MainActivity extends AppCompatActivity implements CallBack {
     public void setData(String topic,String strMessage) {
         Log.i("============","topic:"+topic+"----strMessage:"+strMessage);
         FragmentTransaction transaction = manager.beginTransaction();
-        if("002_meetList".equals(topic)){
+        if(CodeConstants.TOPIC_CURRENT_MEETING.equals(topic)){
+            //todo   当前会议
+            if(!"".equals(strMessage)&& !strMessage.equals(null)){
+                SharePreferenceManager.setMeetingCurrentData(strMessage);
+                String mubanType1= JSON.parseObject(strMessage).getString("template");
+                SharePreferenceManager.setMeetingMuBanType(mubanType1);
+                if(mubanType1.equals("1")){//模板类型
+//                    transaction.replace(R.id.viewPager,AFragment.newInstance(topic,strMessage,SharePreferenceManager.getMeetingTodayData())).commit();
+                }else{
+                    transaction.replace(R.id.viewPager,BFragment.newInstance(topic,strMessage,SharePreferenceManager.getMeetingTodayData())).commit();
+                }
+            }
+        }
+        if(CodeConstants.TOPIC_MEETING_LIST.equals(topic)){
             //todo   会议列表
-            SharePreferenceManager.setMeetingTodayData(strMessage);
+            if(!"".equals(strMessage)&& !strMessage.equals(null)){
+                SharePreferenceManager.setMeetingTodayData(strMessage);
+                String mubanType2= SharePreferenceManager.getMeetingMuBanType();
+                if(mubanType2.equals("1")){
+//                    transaction.replace(R.id.viewPager,AFragment.newInstance(topic,SharePreferenceManager.getMeetingCurrentData(),strMessage)).commit();
+                }else if (mubanType2.equals("2")){
+                    transaction.replace(R.id.viewPager,BFragment.newInstance(topic,SharePreferenceManager.getMeetingCurrentData(),strMessage)).commit();
+                }
+            }
         }
-        if("".equals(topic)){
-            //todo   根据模板id显示相应的模板
-            SharePreferenceManager.setMeetingCurrentData(strMessage);
-        }
-        list = JSON.parseArray(strMessage, MqttMeetingListBean.class);
-        transaction.replace(R.id.viewPager,BFragment.newInstance("B这是主题B","B这是消息内容B")).commit();
-
     }
     private void getWheatherData() {
         OkGo.get(K780Utils.WEATHER_URL).cacheKey(K780Utils.WEATHER_URL).cacheMode(CacheMode.DEFAULT).execute(new StringCallback() {

@@ -19,6 +19,20 @@ public class DateTimeUtil {
         return instance;
     }
 
+    //将时间毫秒数转换为：时分
+    public String transTimeToHHMM(long time) {
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
+        Date date = new Date(time);
+        String curDate = formatter.format(date);
+        return curDate;
+    }
+    //将时间毫秒数转换为：月日
+    public String transTimeToMMDD(long time) {
+        SimpleDateFormat formatter = new SimpleDateFormat("MM-dd");
+        Date date = new Date(time);
+        String curDate = formatter.format(date);
+        return curDate;
+    }
 
     //获取系统当前日期时间
     public String getCurrentDateTime() {

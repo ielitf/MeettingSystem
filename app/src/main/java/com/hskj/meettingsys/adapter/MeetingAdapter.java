@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import com.hskj.meettingsys.R;
 import com.hskj.meettingsys.bean.MqttMeetingListBean;
+import com.hskj.meettingsys.utils.DateTimeUtil;
 
 import java.util.List;
 
@@ -34,9 +35,14 @@ public class MeetingAdapter extends MyBaseAdapter<MqttMeetingListBean> {
     @Override
     protected void bindView(Context context, View view, int position, MqttMeetingListBean model) {
         ViewHolder holderView = (ViewHolder) view.getTag();
-        holderView.day.setText(model.getStartDate());
-        holderView.hour.setText(model.getEndDate());
-        holderView.title.setText(model.getName());
+        holderView.day.setText(DateTimeUtil.getInstance().getCurrentDateMMDD());
+        holderView.hour.setText(model.getStartDate()+"-"+model.getEndDate());
+        if ("true".equals(model.getOpen())){
+            holderView.title.setText(model.getName());
+        }
+        if("false".equals(model.getOpen())){
+            holderView.title.setText("未公开");
+        }
         holderView.order.setText(model.getBookPerson());
     }
 

@@ -43,8 +43,15 @@ public class DateTimeUtil {
     }
 
 
-    //获取系统当前日期
-    public String getCurrentDate() {
+    //获取系统当前日期(月日)
+    public String getCurrentDateMMDD() {
+        SimpleDateFormat formatter = new SimpleDateFormat("MM-dd");
+        Date date = new Date(System.currentTimeMillis());
+        String curDate = formatter.format(date);
+        return curDate;
+    }
+    //获取系统当前日期(年月日)
+    public String getCurrentDateYYMMDD() {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
         Date date = new Date(System.currentTimeMillis());
         String curDate = formatter.format(date);

@@ -10,47 +10,47 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-
 import com.alibaba.fastjson.JSON;
-import com.hskj.meettingsys.adapter.MeetingAdapterA;
+import com.hskj.meettingsys.bean.MqttMeetingCurrentBean;
+import com.hskj.meettingsys.bean.MqttMeetingListBean;
 import com.hskj.meettingsys.listener.OnGetCurrentDateTimeListener;
 import com.hskj.meettingsys.R;
+import com.hskj.meettingsys.utils.MqttService;
 import com.hskj.meettingsys.utils.TimeThread;
 import com.hskj.meettingsys.adapter.MeetingAdapter;
-import com.hskj.meettingsys.bean.MeetingData;
-import com.hskj.meettingsys.bean.MeetingItemBean;
 import com.hskj.meettingsys.utils.DateTimeUtil;
-
-import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class AFragment extends Fragment implements OnGetCurrentDateTimeListener{
+public class AFragment extends Fragment implements OnGetCurrentDateTimeListener {
     private static final String ARG_PARAM1 = "topic";
-    private static final String ARG_PARAM2 = "jsonStr";
-
+    private static final String ARG_PARAM2 = "strCurrentMeeting";
+    private static final String ARG_PARAM3 = "strMeetingList";
     private String topic;
-    private String jsonStr;
+    private String strCurrentMeeting, strMeetingList;
     private View convertView;
     private Context context;
-    private ListView meeting_list;
-    private List<MeetingItemBean> list = new ArrayList<>();
-    private MeetingAdapterA adapter;
-    private TextView timeTv, dataTv;
+    private ListView meeting_listView;
+    private List<MqttMeetingListBean> meetingList = new ArrayList<>();
+    private List<MqttMeetingCurrentBean> curMeetingList = new ArrayList<>();
+    private MeetingAdapter adapter;
+    private TextView timeTv, dataTv, roomName, meetingName, meetingTime, meeting_bumen;
     private DateTimeUtil dateTimeUtil;
-
-    private TimeThread timeThreadUtil;
+    private ImageView imageView;
+    private TimeThread timeThread;
+    private JSONObject jsonObject;
 
     public AFragment() {
 
     }
-    public static AFragment newInstance(String topic, String jsonStr) {
+
+    public static AFragment newInstance(String topic, String strCurrentMeeting, String strMeetingList) {
         AFragment fragment = new AFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, topic);
-        args.putString(ARG_PARAM2, jsonStr);
+        args.putString(ARG_PARAM2, strCurrentMeeting);
+        args.putString(ARG_PARAM3, strMeetingList);
         fragment.setArguments(args);
         return fragment;
     }
@@ -60,8 +60,15 @@ public class AFragment extends Fragment implements OnGetCurrentDateTimeListener{
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             topic = getArguments().getString(ARG_PARAM1);
-            jsonStr = getArguments().getString(ARG_PARAM2);
-            Log.i("=====AFragment收到的", "topic:" + topic +"；jsonStr:"+jsonStr);
+            strCurrentMeeting = getArguments().getString(ARG_PARAM2);
+            strMeetingList = getArguments().getString(ARG_PARAM3);
+            Log.i("=====A模板", "topic:" + topic + "；strCurrentMeeting:" + strCurrentMeeting + "；strMeetingList:" + strMeetingList);
+            if(topic.equals(MqttService.TOPIC_MEETING_CUR)){//当前会议数据
+                curMeetingList = JSON.parseArray(strCurrentMeeting, MqttMeetingCurrentBean.class);
+            }
+            if(topic.equals(MqttService.TOPIC_MEETING_LIST)){//会议列表
+                meetingList = JSON.parseArray(strMeetingList, MqttMeetingListBean.class);
+            }
         }
     }
 
@@ -71,36 +78,51 @@ public class AFragment extends Fragment implements OnGetCurrentDateTimeListener{
         convertView = inflater.inflate(R.layout.fragment_form_a, container, false);
         context = getActivity();
         initViews(convertView);
-        initdata();
+
         dateTimeUtil = DateTimeUtil.getInstance();
-        timeThreadUtil = new TimeThread(AFragment.this);
-        timeThreadUtil.start();
+        timeThread = new TimeThread(AFragment.this);
+        timeThread.start();
+
+        adapter = new MeetingAdapter(context, meetingList);
+        meeting_listView.setAdapter(adapter);
 
         return convertView;
     }
-    private void initViews(View view) {
-        meeting_list = view.findViewById(R.id.meeting_lista);
-        timeTv =view. findViewById(R.id.timea);
-        dataTv = view.findViewById(R.id.dataa);
-    }
 
-    private void initdata() {
-        for (int i = 0; i < MeetingData.meeting_data_day.length; i++) {
-            list.add(new MeetingItemBean(MeetingData.meeting_data_day[i], MeetingData.meeting_data_hour[i], MeetingData.meeting_title[i], MeetingData.meeting_order[i]));
+    private void initViews(View view) {
+        meeting_listView = view.findViewById(R.id.meeting_lista);
+        timeTv = view.findViewById(R.id.timea);
+        dataTv = view.findViewById(R.id.dataa);
+        imageView = view.findViewById(R.id.action_image);
+        roomName = view.findViewById(R.id.current_room_name_a);
+        meetingName = view.findViewById(R.id.current_meeting_name_a);
+        meetingTime = view.findViewById(R.id.current_meeting_time_a);
+        meeting_bumen = view.findViewById(R.id.current_meeting_bm_a);
+
+        if(curMeetingList.size() > 0){
+            //设置当前会议数据
+            roomName.setText(curMeetingList.get(0).getRoomName());
+            meetingName.setText(curMeetingList.get(0).getMeetingName());
+//            String startTime = DateTimeUtil.getInstance().transTimeToHHMM(Long.parseLong(jsonObject.getString("startTime")));
+//            String endTime = DateTimeUtil.getInstance().transTimeToHHMM(Long.parseLong(jsonObject.getString("endTime")));
+//            meetingTime.setText(startTime+"-"+endTime);
+            meeting_bumen.setText(curMeetingList.get(0).getDepartment());
+        }else {
+            roomName.setText("会议室");
+            meetingName.setText("");
+            meetingTime.setText("");
+            meeting_bumen.setText("");
         }
-        adapter = new MeetingAdapterA(context, list);
-        meeting_list.setAdapter(adapter);
     }
 
     @Override
     public void onGetDateTime() {
         timeTv.setText(dateTimeUtil.getCurrentTime());//显示时间
-        dataTv.setText(dateTimeUtil.getCurrentDate() + "\t\t" + dateTimeUtil.getCurrentWeekDay(0));//显示年月日
+        dataTv.setText(dateTimeUtil.getCurrentDateYYMMDD() + "\t\t" + dateTimeUtil.getCurrentWeekDay(0));//显示年月日
     }
 
     @Override
     public void onDestroy() {
-        Log.i("=====onDestroyaaaaaaa", "onDestroyaaaaaaa");
         super.onDestroy();
     }
 }

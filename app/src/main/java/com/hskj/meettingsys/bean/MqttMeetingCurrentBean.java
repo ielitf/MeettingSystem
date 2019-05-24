@@ -1,20 +1,13 @@
 package com.hskj.meettingsys.bean;
 
 public class MqttMeetingCurrentBean {
-    private String name;//会议主题名称
     private String department;//部门
-    private String startTime;//开始时间
-    private String endTime;//结束时间
-    private String template;//模板类型
-    private String isOpen;//是否公开
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
+    private String endDate;//结束时间
+    private String isOpen;//是否公开  字符串true:公开 false:未公开
+    private int meetingId;
+    private String meetingName;//会议主题名称
+    private String roomName;//会议室名称
+    private String startDate;//开始时间
 
     public String getDepartment() {
         return department;
@@ -24,28 +17,12 @@ public class MqttMeetingCurrentBean {
         this.department = department;
     }
 
-    public String getStartTime() {
-        return startTime;
+    public String getEndDate() {
+        return endDate;
     }
 
-    public void setStartTime(String startTime) {
-        this.startTime = startTime;
-    }
-
-    public String getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(String endTime) {
-        this.endTime = endTime;
-    }
-
-    public String getTemplate() {
-        return template;
-    }
-
-    public void setTemplate(String template) {
-        this.template = template;
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
     }
 
     public String getIsOpen() {
@@ -56,15 +33,48 @@ public class MqttMeetingCurrentBean {
         this.isOpen = isOpen;
     }
 
+    public int getMeetingId() {
+        return meetingId;
+    }
+
+    public void setMeetingId(int meetingId) {
+        this.meetingId = meetingId;
+    }
+
+    public String getMeetingName() {
+        return meetingName;
+    }
+
+    public void setMeetingName(String meetingName) {
+        this.meetingName = meetingName;
+    }
+
+    public String getRoomName() {
+        return roomName;
+    }
+
+    public void setRoomName(String roomName) {
+        this.roomName = roomName;
+    }
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+
     @Override
     public String toString() {
         return "MqttMeetingCurrentBean{" +
-                "name='" + name + '\'' +
-                ", department='" + department + '\'' +
-                ", startTime='" + startTime + '\'' +
-                ", endTime='" + endTime + '\'' +
-                ", template='" + template + '\'' +
+                "department='" + department + '\'' +
+                ", endDate='" + endDate + '\'' +
                 ", isOpen='" + isOpen + '\'' +
+                ", meetingId=" + meetingId +
+                ", meetingName='" + meetingName + '\'' +
+                ", roomName='" + roomName + '\'' +
+                ", startDate='" + startDate + '\'' +
                 '}';
     }
 }

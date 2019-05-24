@@ -2,11 +2,11 @@ package com.hskj.meettingsys.bean;
 
 public class MqttMeetingListBean {
     private String bookPerson;//预订人
-    private String isOpen;//是否公开
+    private Boolean isOpen;//是否公开
     private String endDate;
     private String name;//会议主题名称
     private int id;
-    private int templateId;//
+    private String templateId;//
     private String startDate; //日期
 
     public String getBookPerson() {
@@ -17,12 +17,12 @@ public class MqttMeetingListBean {
         this.bookPerson = bookPerson;
     }
 
-    public String getIsOpen() {
+    public Boolean getOpen() {
         return isOpen;
     }
 
-    public void setIsOpen(String isOpen) {
-        this.isOpen = isOpen;
+    public void setOpen(Boolean open) {
+        isOpen = open;
     }
 
     public String getEndDate() {
@@ -49,11 +49,11 @@ public class MqttMeetingListBean {
         this.id = id;
     }
 
-    public int getTemplateId() {
+    public String getTemplateId() {
         return templateId;
     }
 
-    public void setTemplateId(int templateId) {
+    public void setTemplateId(String templateId) {
         this.templateId = templateId;
     }
 
@@ -69,11 +69,11 @@ public class MqttMeetingListBean {
     public String toString() {
         return "MqttMeetingListBean{" +
                 "bookPerson='" + bookPerson + '\'' +
-                ", isOpen='" + isOpen + '\'' +
+                ", isOpen=" + isOpen +
                 ", endDate='" + endDate + '\'' +
                 ", name='" + name + '\'' +
                 ", id=" + id +
-                ", templateId=" + templateId +
+                ", templateId='" + templateId + '\'' +
                 ", startDate='" + startDate + '\'' +
                 '}';
     }

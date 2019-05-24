@@ -34,7 +34,7 @@ import static android.content.ContentValues.TAG;
 
 public class MqttService extends Service {
 
-    public final String clientId = "NamePlate01_Client_J_Area_1A01R11";
+    public static String clientId = "litf";
     //    public static final String BROKER_URL = "tcp://172.20.10.5:1883";
 //    public static final String BROKER_URL = "http://172.16.30.185:8080/send?topic=sss&content=5555bvfnhgfh";
 //    public static final String BROKER_URL = "tcp://172.16.30.185:1883";//zzx
@@ -42,12 +42,12 @@ public class MqttService extends Service {
     public static final String BROKER_URL = "tcp://172.16.30.226:1883";//浩浩
     //    public static final String TOPIC = "com.ceiv.hw.communication.rx5";//东东
     public static  String TOPIC_MEETING_LIST = "002_meetList";//浩浩
-    public static  String TOPIC_MEETING_CUR = "002_meetList";//浩浩
+    public static  String TOPIC_MEETING_CUR = "002_currtMeet";//浩浩
     //    private String userName = "dongdongjia";//东东
 //    private String passWord = "dongdongjia";//东东
-    private String userName = "easton";
-    private String passWord = "easton";
-
+    private static String userName = "easton";
+    private static String passWord = "easton";
+    private static String roomNum;//会议室编号
 
     public MqttClient mqttClient;
     public MqttConnectOptions options;
@@ -59,30 +59,12 @@ public class MqttService extends Service {
         mCallBack = callBack;
     }
 
-    private int roomNum;//会议室编号
-
     public MqttService() {
 
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-//        switch (SharePreferenceManager.getMeetingRoomNum()) {
-//            case 1:
-//                TOPIC_MEETING_LIST = "002_meetList";//浩浩
-//                TOPIC_MEETING_CUR = "002_meetList";//浩浩
-//                break;
-//            case 2:
-//                break;
-//            case 3:
-//                break;
-//            case 4:
-//                break;
-//            case 5:
-//                break;
-//            default:
-//                break;
-//        }
         Notification.Builder builder = new Notification.Builder(this.getApplicationContext()); //获取一个Notification构造器
         Intent nfIntent = new Intent(this, MainActivity.class);
         builder.setContentIntent(PendingIntent.
@@ -110,6 +92,14 @@ public class MqttService extends Service {
      * 初始化相关数据
      */
     public void init() {
+        clientId = clientId + System.currentTimeMillis();
+        roomNum = SDCardUtils.readTxt();
+        TOPIC_MEETING_LIST = roomNum + "_meetList";
+        TOPIC_MEETING_CUR = roomNum + "_currtMeet";
+
+        Log.i("===当前会议室编号：", roomNum);
+
+        // todo 设置主题
         try {
             mqttClient = new MqttClient(BROKER_URL, clientId, new MemoryPersistence());
             //MQTT的连接设置
@@ -135,8 +125,8 @@ public class MqttService extends Service {
 
                 @Override
                 public void messageArrived(String topic, MqttMessage message) throws Exception {
-                    Log.i(TAG, "接收消息主题 : " + topic);
-                    Log.i(TAG, "接收消息Qos : " + message.getQos());
+                    Log.i("===", "接收消息主题 : " + topic);
+                    Log.i("===", "接收消息Qos : " + message.getQos());
                     String str = new String(message.getPayload());
                     mCallBack.setData(topic, str);
                 }
@@ -174,6 +164,18 @@ public class MqttService extends Service {
 
     /*连接服务器，并订阅消息主题*/
     private void connect() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    mqttClient.connect(options);
+                    mqttClient.subscribe(TOPIC_MEETING_CUR);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
         new Thread(new Runnable() {
             @Override
             public void run() {

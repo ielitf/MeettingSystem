@@ -41,8 +41,8 @@ public class MqttService extends Service {
 //    public static final String BROKER_URL = "tcp://172.16.30.234:1883";//东东
     public static final String BROKER_URL = "tcp://172.16.30.226:1883";//浩浩
     //    public static final String TOPIC = "com.ceiv.hw.communication.rx5";//东东
-    public static  String TOPIC_MEETING_LIST = "002_meetList";//浩浩
-    public static  String TOPIC_MEETING_CUR = "002_currtMeet";//浩浩
+    public static  String TOPIC_MEETING_LIST = "";//浩浩
+    public static  String TOPIC_MEETING_CUR = "";//浩浩
     //    private String userName = "dongdongjia";//东东
 //    private String passWord = "dongdongjia";//东东
     private static String userName = "easton";
@@ -54,6 +54,8 @@ public class MqttService extends Service {
     private ScheduledExecutorService scheduler;
     private ConnectivityManager mConnectivityManager; //网络状态监测
     private static CallBack mCallBack;
+    private static String[] topicFilters ;
+    private static int[] qos ;
 
     public static void setCallBack(CallBack callBack) {
         mCallBack = callBack;
@@ -96,7 +98,8 @@ public class MqttService extends Service {
         roomNum = SDCardUtils.readTxt();
         TOPIC_MEETING_LIST = roomNum + "_meetList";
         TOPIC_MEETING_CUR = roomNum + "_currtMeet";
-
+        topicFilters = new String[]{TOPIC_MEETING_CUR,TOPIC_MEETING_LIST};
+        qos = new int[]{0,1};
         Log.i("===当前会议室编号：", roomNum);
 
         // todo 设置主题
@@ -164,24 +167,25 @@ public class MqttService extends Service {
 
     /*连接服务器，并订阅消息主题*/
     private void connect() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    mqttClient.connect(options);
-                    mqttClient.subscribe(TOPIC_MEETING_CUR);
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    mqttClient.connect(options);
+////                    mqttClient.subscribe(TOPIC_MEETING_CUR);
+//                    mqttClient.subscribe(topicFilters,qos);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }).start();
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     mqttClient.connect(options);
                     mqttClient.subscribe(TOPIC_MEETING_LIST);
+//                    mqttClient.subscribe(TOPIC_MEETING_CUR);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

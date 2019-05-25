@@ -53,7 +53,7 @@ public class SharePreferenceManager {
 
     public static String getMeetingMuBanType() {
         if (null != sp) {
-            return sp.getString(MEETING_MUBAN_TYPE, null);
+            return sp.getString(MEETING_MUBAN_TYPE, "1");
         }
         return null;
     }

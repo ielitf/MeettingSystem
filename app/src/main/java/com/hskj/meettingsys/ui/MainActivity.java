@@ -35,26 +35,28 @@ import java.util.List;
 import okhttp3.Call;
 import okhttp3.Response;
 
-public class MainActivity extends AppCompatActivity implements CallBack , View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements CallBack, View.OnClickListener {
     private List<Fragment> frags;
     private AFragment aFragment = new AFragment();
-    private BFragment bFragment =  new BFragment();
+    private BFragment bFragment = new BFragment();
     private LinearLayout viewPager;
     private FragmentManager manager;
-    private TextView ceshi,room;
+    private TextView ceshi, room;
     private int kk;
     private boolean aBoolean = true;
-    private List<MqttMeetingListBean> list = new ArrayList<>();
+    private List<MqttMeetingListBean> meetingList = new ArrayList<>();
     private String topic;
+    private String templateId;// 0 代表模板A   1代表模板2
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        templateId = SharePreferenceManager.getMeetingMuBanType();//获取存储的磨板类型，默认值：“1”
         if (!isServiceRunning(String.valueOf(MqttService.class))) {
             startService(new Intent(this, MqttService.class));
-        }else{
-            Log.i("===服务正在运行","return");
+        } else {
+            Log.i("===服务正在运行", "return");
             return;
         }
         MqttService.setCallBack(this);
@@ -68,46 +70,47 @@ public class MainActivity extends AppCompatActivity implements CallBack , View.O
 
         manager = getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
-        transaction.add(R.id.viewPager,aFragment).commit();
-
+        if (templateId.equals("1")) {
+            transaction.add(R.id.viewPager, bFragment).commit();
+        }else {
+            transaction.add(R.id.viewPager, aFragment).commit();
+        }
     }
+
     @Override
-    public void setData(String topic,String strMessage) {
+    public void setData(String topic, String strMessage) {
         this.topic = topic;
-        Log.i("============","topic:"+topic+";----strMessage:"+strMessage);
+        Log.i("============", "topic:" + topic + ";----strMessage:" + strMessage);
         FragmentTransaction transaction = manager.beginTransaction();
-        if(CodeConstants.TOPIC_MEETING_CUR.equals(topic)){
+        if (MqttService.TOPIC_MEETING_CUR.equals(topic)) {
             //todo   当前会议
-            if(!"".equals(strMessage)&& !strMessage.equals(null)){
-                SharePreferenceManager.setMeetingCurrentData(strMessage);
-                String mubanType1= JSON.parseObject(strMessage).getString("templateId");
-                SharePreferenceManager.setMeetingMuBanType(mubanType1);
-
-                if(mubanType1.equals("1")){//模板类型
-//                    transaction.replace(R.id.viewPager,AFragment.newInstance(topic,strMessage,SharePreferenceManager.getMeetingTodayData())).commit();
-                }else{
-                    transaction.replace(R.id.viewPager,BFragment.newInstance(topic,strMessage,SharePreferenceManager.getMeetingTodayData())).commit();
+            if (!"".equals(strMessage) && !strMessage.equals(null)) {
+                SharePreferenceManager.setMeetingCurrentData(strMessage);//存储当前会议，当只收到今日会议列表时，用于从缓存中读取当前会议
+                templateId = SharePreferenceManager.getMeetingMuBanType();//读取存储的模板类型
+                if (templateId.equals("1")) {//模板类型B
+                    transaction.replace(R.id.viewPager, BFragment.newInstance(topic, strMessage, SharePreferenceManager.getMeetingTodayData())).commit();
+                } else {
+                    transaction.replace(R.id.viewPager,AFragment.newInstance(topic,strMessage,SharePreferenceManager.getMeetingTodayData())).commit();
                 }
             }
         }
-        if(CodeConstants.TOPIC_MEETING_LIST.equals(topic)){
+
+        if (MqttService.TOPIC_MEETING_LIST.equals(topic)) {
             //todo   会议列表
-            if(!"".equals(strMessage)&& !strMessage.equals(null)){
-                SharePreferenceManager.setMeetingTodayData(strMessage);
-                String mubanType2= SharePreferenceManager.getMeetingMuBanType();
-
-                transaction.replace(R.id.viewPager,BFragment.newInstance(topic,CodeConstants.MEETING_CUR_DATA,strMessage)).commit();
-//                transaction.replace(R.id.viewPager,BFragment.newInstance(topic,SharePreferenceManager.getMeetingCurrentData(),strMessage)).commit();
-
-
-                if(mubanType2.equals("1")){
-//                    transaction.replace(R.id.viewPager,AFragment.newInstance(topic,SharePreferenceManager.getMeetingCurrentData(),strMessage)).commit();
-                }else{
-                    transaction.replace(R.id.viewPager,BFragment.newInstance(topic,SharePreferenceManager.getMeetingCurrentData(),strMessage)).commit();
+            if (!"".equals(strMessage) && !strMessage.equals(null)) {
+                meetingList = JSON.parseArray(strMessage, MqttMeetingListBean.class);
+                templateId = meetingList.get(0).getTemplateId();
+                SharePreferenceManager.setMeetingMuBanType(templateId);
+                SharePreferenceManager.setMeetingTodayData(strMessage);//存储今日会议列表，当只收到当前会议时，用于从缓存中读取今日列表
+                if (templateId.equals("1")) {//模板B
+                    transaction.replace(R.id.viewPager, BFragment.newInstance(topic, SharePreferenceManager.getMeetingCurrentData(), strMessage)).commit();
+                } else {//模板a
+                    transaction.replace(R.id.viewPager,AFragment.newInstance(topic,SharePreferenceManager.getMeetingCurrentData(),strMessage)).commit();
                 }
             }
         }
     }
+
     private void getWheatherData() {
         OkGo.get(K780Utils.WEATHER_URL).cacheKey(K780Utils.WEATHER_URL).cacheMode(CacheMode.DEFAULT).execute(new StringCallback() {
             @Override
@@ -163,18 +166,18 @@ public class MainActivity extends AppCompatActivity implements CallBack , View.O
 
     @Override
     public void onClick(View v) {
-        switch(v.getId()){
+        switch (v.getId()) {
             case R.id.ceshi:
                 FragmentTransaction transaction = manager.beginTransaction();
-                if(aBoolean){
-                    transaction.replace(R.id.viewPager,BFragment.newInstance(topic,CodeConstants.MEETING_CUR_DATA,CodeConstants.MEETING_LIST_DATA)).commit();
+                if (aBoolean) {
+                    transaction.replace(R.id.viewPager, BFragment.newInstance(topic, SharePreferenceManager.getMeetingCurrentData(), SharePreferenceManager.getMeetingTodayData())).commit();
                     aBoolean = false;
-                }else{
-                    transaction.replace(R.id.viewPager,AFragment.newInstance(topic,CodeConstants.MEETING_CUR_DATA,CodeConstants.MEETING_LIST_DATA)).commit();
+                } else {
+                    transaction.replace(R.id.viewPager,AFragment.newInstance(topic,SharePreferenceManager.getMeetingCurrentData(),SharePreferenceManager.getMeetingTodayData())).commit();
                     aBoolean = true;
                 }
-                kk = kk +1;
-                ceshi.setText("ceshi"+kk);
+                kk = kk + 1;
+                ceshi.setText("ceshi" + kk);
                 break;
             case R.id.room:
                 SDCardUtils.writeTxt("002");

@@ -2,12 +2,12 @@ package com.hskj.meettingsys.bean;
 
 public class MqttMeetingListBean {
     private String bookPerson;//预订人
-    private Boolean isOpen;//是否公开
-    private String endDate;
+    private String isOpen;//是否公开  字符串true:公开 false:未公开
+    private long endDate;
     private String name;//会议主题名称
-    private int id;
-    private String templateId;//
-    private String startDate; //日期
+    private int id;//会议ID
+    private String templateId;// 0 代表模板A   1代表模板2
+    private long startDate; //日期
 
     public String getBookPerson() {
         return bookPerson;
@@ -17,19 +17,19 @@ public class MqttMeetingListBean {
         this.bookPerson = bookPerson;
     }
 
-    public Boolean getOpen() {
+    public String getIsOpen() {
         return isOpen;
     }
 
-    public void setOpen(Boolean open) {
-        isOpen = open;
+    public void setIsOpen(String isOpen) {
+        this.isOpen = isOpen;
     }
 
-    public String getEndDate() {
+    public long getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(String endDate) {
+    public void setEndDate(long endDate) {
         this.endDate = endDate;
     }
 
@@ -57,11 +57,11 @@ public class MqttMeetingListBean {
         this.templateId = templateId;
     }
 
-    public String getStartDate() {
+    public long getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(String startDate) {
+    public void setStartDate(long startDate) {
         this.startDate = startDate;
     }
 
@@ -69,12 +69,12 @@ public class MqttMeetingListBean {
     public String toString() {
         return "MqttMeetingListBean{" +
                 "bookPerson='" + bookPerson + '\'' +
-                ", isOpen=" + isOpen +
-                ", endDate='" + endDate + '\'' +
+                ", isOpen='" + isOpen + '\'' +
+                ", endDate=" + endDate +
                 ", name='" + name + '\'' +
                 ", id=" + id +
                 ", templateId='" + templateId + '\'' +
-                ", startDate='" + startDate + '\'' +
+                ", startDate=" + startDate +
                 '}';
     }
 }

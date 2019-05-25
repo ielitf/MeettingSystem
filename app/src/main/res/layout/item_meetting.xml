@@ -16,7 +16,7 @@
     android:id="@+id/meeting_data_hour"
     style="@style/meeting_item"
     android:layout_weight="1"
-    android:text="10:00 - 11:00"
+    android:text="10:01 - 11:11"
     />
 <TextView
     android:id="@+id/meeting_title"

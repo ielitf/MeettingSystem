@@ -35,13 +35,16 @@ public class MeetingAdapter extends MyBaseAdapter<MqttMeetingListBean> {
     @Override
     protected void bindView(Context context, View view, int position, MqttMeetingListBean model) {
         ViewHolder holderView = (ViewHolder) view.getTag();
-        holderView.day.setText(DateTimeUtil.getInstance().getCurrentDateMMDD());
-        holderView.hour.setText(model.getStartDate()+"-"+model.getEndDate());
-        if ("true".equals(model.getOpen())){
+        holderView.day.setText(DateTimeUtil.getInstance().transTimeToMMDD(model.getStartDate()));
+
+        holderView.hour.setText(DateTimeUtil.getInstance().transTimeToHHMM(model.getStartDate())+"-"+DateTimeUtil.getInstance().transTimeToHHMM(model.getEndDate()));
+        if ("true".equals(model.getIsOpen())){
             holderView.title.setText(model.getName());
-        }
-        if("false".equals(model.getOpen())){
+        } else
+        if("false".equals(model.getIsOpen())){
             holderView.title.setText("未公开");
+        }else{
+            holderView.title.setText(model.getName());
         }
         holderView.order.setText(model.getBookPerson());
     }

@@ -167,30 +167,31 @@ public class MqttService extends Service {
 
     /*连接服务器，并订阅消息主题*/
     private void connect() {
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    mqttClient.connect(options);
-////                    mqttClient.subscribe(TOPIC_MEETING_CUR);
-//                    mqttClient.subscribe(topicFilters,qos);
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }).start();
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     mqttClient.connect(options);
-                    mqttClient.subscribe(TOPIC_MEETING_LIST);
 //                    mqttClient.subscribe(TOPIC_MEETING_CUR);
+                    mqttClient.subscribe(topicFilters,qos);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }).start();
+
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    mqttClient.connect(options);
+////                    mqttClient.subscribe(TOPIC_MEETING_LIST);
+//                    mqttClient.subscribe(TOPIC_MEETING_CUR);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }).start();
     }
 
     /**

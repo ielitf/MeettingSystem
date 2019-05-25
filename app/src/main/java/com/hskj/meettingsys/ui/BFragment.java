@@ -63,6 +63,7 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener 
             strCurrentMeeting = getArguments().getString(ARG_PARAM2);
             strMeetingList = getArguments().getString(ARG_PARAM3);
             Log.i("=====B模板", "topic:" + topic + "；strCurrentMeeting:" + strCurrentMeeting + "；strMeetingList:" + strMeetingList);
+
             if(MqttService.TOPIC_MEETING_CUR.equals(topic)){//当前会议数据
                 curMeetingList = JSON.parseArray(strCurrentMeeting, MqttMeetingCurrentBean.class);
             }

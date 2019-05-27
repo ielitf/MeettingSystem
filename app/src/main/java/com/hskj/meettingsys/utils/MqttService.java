@@ -100,7 +100,7 @@ public class MqttService extends Service {
         TOPIC_MEETING_CUR = roomNum + "_currtMeet";
         topicFilters = new String[]{TOPIC_MEETING_CUR,TOPIC_MEETING_LIST};
         qos = new int[]{0,1};
-        Log.i("===当前会议室编号：", roomNum);
+        Log.i("===当前会议室编号：", roomNum+"");
 
         // todo 设置主题
         try {

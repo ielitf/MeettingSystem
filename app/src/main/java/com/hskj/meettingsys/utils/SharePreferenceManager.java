@@ -39,7 +39,7 @@ public class SharePreferenceManager {
         if (null != sp) {
             return sp.getString(MEETING_CURRENT_DATA, null);
         }
-        return null;
+        return "";
     }
     /**
      * 当前会议显示的模板类型
@@ -71,7 +71,7 @@ public class SharePreferenceManager {
         if (null != sp) {
             return sp.getString(MEETING_TODAY_DATA, null);
         }
-        return null;
+        return "";
     }
     /**
      * 缓存主页数据

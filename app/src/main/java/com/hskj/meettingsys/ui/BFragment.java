@@ -63,12 +63,15 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener 
             strCurrentMeeting = getArguments().getString(ARG_PARAM2);
             strMeetingList = getArguments().getString(ARG_PARAM3);
             Log.i("=====B模板", "topic:" + topic + "；strCurrentMeeting:" + strCurrentMeeting + "；strMeetingList:" + strMeetingList);
-
             if(MqttService.TOPIC_MEETING_CUR.equals(topic)){//当前会议数据
-                curMeetingList = JSON.parseArray(strCurrentMeeting, MqttMeetingCurrentBean.class);
+                if(strCurrentMeeting != null){
+                    curMeetingList = JSON.parseArray(strCurrentMeeting, MqttMeetingCurrentBean.class);
+                }
             }
             if(MqttService.TOPIC_MEETING_LIST.equals(topic)){//会议列表
-                meetingList = JSON.parseArray(strMeetingList, MqttMeetingListBean.class);
+                if(strMeetingList != null){
+                    meetingList = JSON.parseArray(strMeetingList, MqttMeetingListBean.class);
+                }
             }
         }
     }
@@ -84,8 +87,10 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener 
         timeThread = new TimeThread(BFragment.this);
         timeThread.start();
 
-        adapter = new MeetingAdapter(context, meetingList);
-        meeting_listView.setAdapter(adapter);
+        if(meetingList.size()>0){
+            adapter = new MeetingAdapter(context, meetingList);
+            meeting_listView.setAdapter(adapter);
+        }
 
         return convertView;
     }
@@ -104,9 +109,9 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener 
             //设置当前会议数据
             roomName.setText(curMeetingList.get(0).getRoomName());
             meetingName.setText(curMeetingList.get(0).getMeetingName());
-//            String startTime = DateTimeUtil.getInstance().transTimeToHHMM(Long.parseLong(jsonObject.getString("startTime")));
-//            String endTime = DateTimeUtil.getInstance().transTimeToHHMM(Long.parseLong(jsonObject.getString("endTime")));
-//            meetingTime.setText(startTime+"-"+endTime);
+            String startTime = DateTimeUtil.getInstance().transTimeToHHMM(curMeetingList.get(0).getStartDate());
+            String endTime = DateTimeUtil.getInstance().transTimeToHHMM(curMeetingList.get(0).getEndDate());
+            meetingTime.setText(startTime+"-"+endTime);
             meeting_bumen.setText(curMeetingList.get(0).getDepartment());
         }else {
             roomName.setText("会议室");

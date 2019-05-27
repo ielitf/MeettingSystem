@@ -182,7 +182,7 @@ public class SDCardUtils {
      */
     public static void writeTxt(String str) {
         //新建文件夹
-        String folderName = "慧视科技";
+        String folderName = "huishikeji";
         File sdCardDir2 = new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_DOWNLOADS), folderName);
         File sdCardDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), folderName);
@@ -197,7 +197,7 @@ public class SDCardUtils {
         }
         try {
             //新建文件
-            File saveFile = new File(sdCardDir, "慧视科技.txt");
+            File saveFile = new File(sdCardDir, "huishikeji.txt");
             if (!saveFile.exists()) {
                 saveFile.createNewFile();
             }
@@ -226,7 +226,7 @@ public class SDCardUtils {
         try {
             String file2 = Environment.getExternalStoragePublicDirectory(
                     Environment.DIRECTORY_DOWNLOADS) + "/User/user.txt";
-            String file = Environment.getExternalStorageDirectory().getAbsolutePath() + "/慧视科技/慧视科技.txt";
+            String file = Environment.getExternalStorageDirectory().getAbsolutePath() + "/huishikeji/huishikeji.txt";
             bre = new BufferedReader(new FileReader(file));//此时获取到的bre就是整个文件的缓存流
 
             String a;

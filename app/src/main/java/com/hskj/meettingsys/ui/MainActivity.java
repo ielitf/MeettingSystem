@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
     @Override
     public void setData(String topic, String strMessage) {
         this.topic = topic;
-        Log.i("============", "topic:" + topic + ";----strMessage:" + strMessage);
+        Log.i("============Main", "topic:" + topic + ";----strMessage:" + strMessage);
         FragmentTransaction transaction = manager.beginTransaction();
         if (MqttService.TOPIC_MEETING_CUR.equals(topic)) {
             //todo   当前会议
@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
             if (!"".equals(strMessage) && !strMessage.equals(null)) {
                 meetingList = JSON.parseArray(strMessage, MqttMeetingListBean.class);
                 templateId = meetingList.get(0).getTemplateId();
-                SharePreferenceManager.setMeetingMuBanType(templateId);
+                SharePreferenceManager.setMeetingMuBanType(templateId);//将模板类型存到本地缓存中
                 SharePreferenceManager.setMeetingTodayData(strMessage);//存储今日会议列表，当只收到当前会议时，用于从缓存中读取今日列表
                 if (templateId.equals("1")) {//模板B
                     transaction.replace(R.id.viewPager, BFragment.newInstance(topic, SharePreferenceManager.getMeetingCurrentData(), strMessage)).commit();

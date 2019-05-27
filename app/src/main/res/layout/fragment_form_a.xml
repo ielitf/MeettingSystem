@@ -45,6 +45,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:singleLine="true"
                     android:text="当前会议："
                     android:paddingLeft="@dimen/px40_dp"
                     android:textColor="@color/white"
@@ -53,10 +54,11 @@
                     android:id="@+id/current_meeting_name_a"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:singleLine="true"
                     android:gravity="center"
                     android:text="新产品发布会"
                     android:textColor="@color/white"
-                    android:textSize="30sp" />
+                    android:textSize="@dimen/a_meeting_cur_name" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -68,19 +70,21 @@
                         android:id="@+id/current_meeting_time_a"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:singleLine="true"
                         android:gravity="center"
                         android:text="10:00-11:30"
                         android:textColor="@color/white"
-                        android:textSize="20sp" />
+                        android:textSize="@dimen/a_meeting_cur_time" />
                     <TextView
                         android:id="@+id/current_meeting_bm_a"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:singleLine="true"
                         android:layout_marginLeft="@dimen/px40_dp"
                         android:gravity="center"
                         android:text="市场部"
                         android:textColor="@color/white"
-                        android:textSize="20sp" />
+                        android:textSize="@dimen/a_meeting_cur_bumen" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -105,20 +109,22 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="4"
+                        android:singleLine="true"
                         android:text="会议列表"
                         android:paddingLeft="@dimen/px40_dp"
                         android:gravity="center_vertical"
                         android:textColor="@color/white"
-                        android:textSize="@dimen/px45_sp" />
+                        android:textSize="@dimen/a_meeting_list1" />
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="2"
+                        android:singleLine="true"
                         android:gravity="center"
                         android:text="conference list"
                         android:textColor="@color/white"
-                        android:textSize="@dimen/px45_sp" />
+                        android:textSize="@dimen/a_meeting_list2" />
 
                 </LinearLayout>
 
@@ -187,10 +193,11 @@
                     android:id="@+id/current_room_name_a"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:singleLine="true"
                     android:layout_marginTop="@dimen/px30_dp"
                     android:gravity="center"
                     android:text="308"
-                    android:textSize="30sp"
+                    android:textSize="@dimen/a_meeting_room_name"
                     android:textColor="@color/white"
                     />
                 <TextView
@@ -228,19 +235,21 @@
                         android:id="@+id/timea"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:singleLine="true"
                         android:gravity="center"
                         android:text="11:20:42"
-                        android:textSize="30sp"
+                        android:textSize="@dimen/a_meeting_time"
                         android:textColor="@color/white"
                         />
                     <TextView
                         android:id="@+id/dataa"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:singleLine="true"
                         android:layout_marginTop="10dp"
                         android:gravity="center"
                         android:text="2019/07/24     星期五"
-                        android:textSize="10sp"
+                        android:textSize="@dimen/a_meeting_data"
                         android:textColor="@color/white"
                         />
 

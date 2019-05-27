@@ -2,12 +2,12 @@ package com.hskj.meettingsys.bean;
 
 public class MqttMeetingCurrentBean {
     private String department;//部门
-    private String endDate;//结束时间
+    private long endDate;//结束时间
     private String isOpen;//是否公开  字符串true:公开 false:未公开
     private int meetingId;
     private String meetingName;//会议主题名称
     private String roomName;//会议室名称
-    private String startDate;//开始时间
+    private long startDate;//开始时间
 
     public String getDepartment() {
         return department;
@@ -15,14 +15,6 @@ public class MqttMeetingCurrentBean {
 
     public void setDepartment(String department) {
         this.department = department;
-    }
-
-    public String getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(String endDate) {
-        this.endDate = endDate;
     }
 
     public String getIsOpen() {
@@ -57,11 +49,19 @@ public class MqttMeetingCurrentBean {
         this.roomName = roomName;
     }
 
-    public String getStartDate() {
+    public long getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(long endDate) {
+        this.endDate = endDate;
+    }
+
+    public long getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(String startDate) {
+    public void setStartDate(long startDate) {
         this.startDate = startDate;
     }
 
@@ -69,12 +69,12 @@ public class MqttMeetingCurrentBean {
     public String toString() {
         return "MqttMeetingCurrentBean{" +
                 "department='" + department + '\'' +
-                ", endDate='" + endDate + '\'' +
+                ", endDate=" + endDate +
                 ", isOpen='" + isOpen + '\'' +
                 ", meetingId=" + meetingId +
                 ", meetingName='" + meetingName + '\'' +
                 ", roomName='" + roomName + '\'' +
-                ", startDate='" + startDate + '\'' +
+                ", startDate=" + startDate +
                 '}';
     }
 }

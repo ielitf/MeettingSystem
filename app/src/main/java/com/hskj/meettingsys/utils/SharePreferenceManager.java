@@ -13,17 +13,17 @@ public class SharePreferenceManager {
      * 选择的会议室编号
      */
     private static final String MEETING_ROOM_NUM = "meeting_room_num";
-    public static void setMeetingRoomNum(int num) {
+    public static void setMeetingRoomNum(String  num) {
         if (null != sp) {
-            sp.edit().putInt(MEETING_ROOM_NUM, num+1).commit();
+            sp.edit().putString(MEETING_ROOM_NUM,num).commit();
         }
     }
 
-    public static int getMeetingRoomNum() {
+    public static String  getMeetingRoomNum() {
         if (null != sp) {
-            return sp.getInt(MEETING_ROOM_NUM, 1);
+            return sp.getString(MEETING_ROOM_NUM, "002");
         }
-        return 1;
+        return "002";
     }
     /**
      * 当前会议数据

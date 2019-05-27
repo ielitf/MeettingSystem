@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
     private int kk;
     private boolean aBoolean = true;
     private List<MqttMeetingListBean> meetingList = new ArrayList<>();
-    private String topic;
+    private static String topicGot;
     private String templateId;// 0 代表模板A   1代表模板2
 
     @Override
@@ -79,12 +79,12 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
 
     @Override
     public void setData(String topic, String strMessage) {
-        this.topic = topic;
+        topicGot = topic;
         Log.i("============Main", "topic:" + topic + ";----strMessage:" + strMessage);
         FragmentTransaction transaction = manager.beginTransaction();
         if (MqttService.TOPIC_MEETING_CUR.equals(topic)) {
             //todo   当前会议
-            if (!"".equals(strMessage) && !strMessage.equals(null)) {
+            if (!"".equals(strMessage) && strMessage !=null) {
                 SharePreferenceManager.setMeetingCurrentData(strMessage);//存储当前会议，当只收到今日会议列表时，用于从缓存中读取当前会议
                 templateId = SharePreferenceManager.getMeetingMuBanType();//读取存储的模板类型
                 if (templateId.equals("1")) {//模板类型B
@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
 
         if (MqttService.TOPIC_MEETING_LIST.equals(topic)) {
             //todo   会议列表
-            if (!"".equals(strMessage) && !strMessage.equals(null)) {
+            if (!"".equals(strMessage) && strMessage!=null) {
                 meetingList = JSON.parseArray(strMessage, MqttMeetingListBean.class);
                 templateId = meetingList.get(0).getTemplateId();
                 SharePreferenceManager.setMeetingMuBanType(templateId);//将模板类型存到本地缓存中
@@ -169,11 +169,11 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
         switch (v.getId()) {
             case R.id.ceshi:
                 FragmentTransaction transaction = manager.beginTransaction();
-                if (aBoolean) {
-                    transaction.replace(R.id.viewPager, BFragment.newInstance(topic, SharePreferenceManager.getMeetingCurrentData(), SharePreferenceManager.getMeetingTodayData())).commit();
+                if (aBoolean) {//  002_currtMeet   002_meetList
+                    transaction.replace(R.id.viewPager, BFragment.newInstance(topicGot, SharePreferenceManager.getMeetingCurrentData(), SharePreferenceManager.getMeetingTodayData())).commit();
                     aBoolean = false;
                 } else {
-                    transaction.replace(R.id.viewPager,AFragment.newInstance(topic,SharePreferenceManager.getMeetingCurrentData(),SharePreferenceManager.getMeetingTodayData())).commit();
+                    transaction.replace(R.id.viewPager,AFragment.newInstance(topicGot,SharePreferenceManager.getMeetingCurrentData(),SharePreferenceManager.getMeetingTodayData())).commit();
                     aBoolean = true;
                 }
                 kk = kk + 1;

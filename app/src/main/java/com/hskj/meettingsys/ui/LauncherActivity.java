@@ -115,7 +115,7 @@ public class LauncherActivity extends AppCompatActivity {
                                    int position, long id) {         //望文生义，当列表项被选择时
             String select = parent.getItemAtPosition(position).toString();//取得被选中的列表项的文字
             Toast.makeText(mContext, select, Toast.LENGTH_SHORT).show();
-            SharePreferenceManager.setMeetingRoomNum(position);
+//            SharePreferenceManager.setMeetingRoomNum(position);
         }
 
         @Override

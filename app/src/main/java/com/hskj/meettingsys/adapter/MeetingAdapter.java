@@ -38,10 +38,10 @@ public class MeetingAdapter extends MyBaseAdapter<MqttMeetingListBean> {
         holderView.day.setText(DateTimeUtil.getInstance().transTimeToMMDD(model.getStartDate()));
 
         holderView.hour.setText(DateTimeUtil.getInstance().transTimeToHHMM(model.getStartDate())+"-"+DateTimeUtil.getInstance().transTimeToHHMM(model.getEndDate()));
-        if ("true".equals(model.getIsOpen())){
+        if ("1".equals(model.getIsOpen())){
             holderView.title.setText(model.getName());
         } else
-        if("false".equals(model.getIsOpen())){
+        if("0".equals(model.getIsOpen())){
             holderView.title.setText("未公开");
         }else{
             holderView.title.setText(model.getName());

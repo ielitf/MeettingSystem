@@ -6,10 +6,20 @@
 
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
-    <color name="back">#2B2B2B</color>
-    <color name="back1">#313335</color>
-    <color name="back2">#44415E5A</color>
+
+    <color name="back_A1">#00000000</color>
+    <color name="back_A2">#33000000</color>
+
+    <color name="back_B2">#88415E5A</color>
+    <color name="back_B">#00000000</color>
+
+    <color name="space_line2">#999999</color>
+    <color name="space_line">#999999</color>
+
+
+
     <color name="transparent">#00000000</color>
+    <color name="transparent1">#22000000</color>
     <drawable name="lightgreen">#7cd12e</drawable>
 
 </resources>

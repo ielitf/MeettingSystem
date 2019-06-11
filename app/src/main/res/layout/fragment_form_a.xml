@@ -2,23 +2,21 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/back"
-    android:orientation="vertical"
-    >
+    android:background="@drawable/back3"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:visibility="gone"
-        >
+        android:visibility="gone">
 
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:adjustViewBounds="true"
             android:scaleType="fitXY"
-            android:src="@drawable/com_logo_top" />
+             />
     </LinearLayout>
 
     <LinearLayout
@@ -36,104 +34,121 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_margin="1dp"
                 android:layout_weight="1.5"
-                android:background="@color/back1"
+                android:background="@color/back_A1"
                 android:gravity="center"
                 android:orientation="vertical">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/px40_dp"
                     android:singleLine="true"
                     android:text="当前会议："
-                    android:paddingLeft="@dimen/px40_dp"
                     android:textColor="@color/white"
-                    android:textSize="10sp" />
-                <TextView
+                    android:textSize="12sp" />
+
+                <com.hskj.meettingsys.utils.MarqueeTextView
                     android:id="@+id/current_meeting_name_a"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:singleLine="true"
                     android:gravity="center"
-                    android:text="新产品发布会"
+                    android:ellipsize="marquee"
+                    android:singleLine="true"
+                    android:text="当前无会议"
                     android:textColor="@color/white"
                     android:textSize="@dimen/a_meeting_cur_name" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
                     android:gravity="center_horizontal"
-                    >
-                    <TextView
+                    android:orientation="horizontal">
+
+                    <com.hskj.meettingsys.utils.MarqueeTextView
                         android:id="@+id/current_meeting_time_a"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:singleLine="true"
                         android:gravity="center"
-                        android:text="10:00-11:30"
+                        android:ellipsize="marquee"
+                        android:singleLine="true"
+                        android:text=""
                         android:textColor="@color/white"
                         android:textSize="@dimen/a_meeting_cur_time" />
-                    <TextView
+
+                    <com.hskj.meettingsys.utils.MarqueeTextView
                         android:id="@+id/current_meeting_bm_a"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:singleLine="true"
                         android:layout_marginLeft="@dimen/px40_dp"
                         android:gravity="center"
-                        android:text="市场部"
+                        android:ellipsize="marquee"
+                        android:singleLine="true"
+                        android:text=""
                         android:textColor="@color/white"
                         android:textSize="@dimen/a_meeting_cur_bumen" />
                 </LinearLayout>
 
             </LinearLayout>
 
-
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="@color/space_line"
+                />
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_margin="1dp"
                 android:layout_weight="4"
                 android:orientation="vertical">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/back1"
-                    android:layout_marginTop="1dp"
-                    android:layout_marginLeft="1dp"
-                    android:layout_marginRight="1dp"
+                    android:background="@color/back_A1"
                     android:orientation="horizontal">
 
-                    <TextView
+                    <com.hskj.meettingsys.utils.MarqueeTextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="4"
+                        android:background="@color/transparent1"
+                        android:paddingBottom="5dp"
+                        android:paddingTop="5dp"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="@dimen/px40_dp"
+                        android:ellipsize="marquee"
                         android:singleLine="true"
                         android:text="会议列表"
-                        android:paddingLeft="@dimen/px40_dp"
-                        android:gravity="center_vertical"
                         android:textColor="@color/white"
                         android:textSize="@dimen/a_meeting_list1" />
 
-                    <TextView
+                    <com.hskj.meettingsys.utils.MarqueeTextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:background="@color/transparent1"
                         android:layout_weight="2"
-                        android:singleLine="true"
                         android:gravity="center"
-                        android:text="conference list"
+                        android:ellipsize="marquee"
+                        android:singleLine="true"
+                        android:text=""
                         android:textColor="@color/white"
-                        android:textSize="@dimen/a_meeting_list2" />
+                        android:textSize="@dimen/a_meeting_list2"
+                        android:visibility="gone"/>
 
                 </LinearLayout>
-
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:background="@color/space_line"
+                    />
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/back1"
-                    android:layout_margin="1dp"
-                    android:paddingTop="@dimen/px45_sp"
+                    android:background="@color/back_A1"
+                    android:orientation="horizontal"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
                     >
 
                     <TextView
@@ -161,18 +176,23 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="0.1dp"
-                    android:background="#888888" />
+                    android:background="@color/back_A2" />
 
                 <ListView
-                    android:id="@+id/meeting_lista"
+                    android:id="@+id/meeting_list_a"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@color/back1"
-                    android:layout_weight="1">
+                    android:layout_height="match_parent"
+                    android:background="@color/back_A1">
 
                 </ListView>
             </LinearLayout>
         </LinearLayout>
+
+        <View
+            android:layout_width="0.5dp"
+            android:layout_height="match_parent"
+            android:background="@color/space_line"
+            />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -184,40 +204,42 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1.5"
-                android:layout_margin="1dp"
+                android:background="@color/back_A2"
                 android:gravity="center"
-                android:background="@color/back"
-                android:orientation="vertical"
-                >
-                <TextView
+                android:orientation="vertical">
+
+                <com.hskj.meettingsys.utils.MarqueeTextView
                     android:id="@+id/current_room_name_a"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:singleLine="true"
                     android:layout_marginTop="@dimen/px30_dp"
                     android:gravity="center"
-                    android:text="308"
-                    android:textSize="@dimen/a_meeting_room_name"
+                    android:ellipsize="marquee"
+                    android:singleLine="true"
+                    android:text="会议室"
                     android:textColor="@color/white"
-                    />
+                    android:textSize="@dimen/a_meeting_room_name" />
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/px15_dp"
                     android:gravity="center"
                     android:text="会议室"
-                    android:textSize="@dimen/px45_sp"
                     android:textColor="@color/white"
-                    android:visibility="gone"
-                    />
+                    android:textSize="@dimen/px45_sp"
+                    android:visibility="gone" />
 
             </LinearLayout>
-
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="@color/space_line"
+                />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_margin="1dp"
                 android:layout_weight="4"
                 android:orientation="vertical">
 
@@ -225,46 +247,56 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="2"
-                    android:layout_margin="1dp"
-                    android:background="@color/back"
+                    android:background="@color/back_A2"
                     android:gravity="center"
-                    android:orientation="vertical"
-                    >
+                    android:orientation="vertical">
 
-                    <TextView
+                    <com.hskj.meettingsys.utils.MarqueeTextView
                         android:id="@+id/timea"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:singleLine="true"
                         android:gravity="center"
+                        android:ellipsize="marquee"
+                        android:singleLine="true"
                         android:text="11:20:42"
-                        android:textSize="@dimen/a_meeting_time"
                         android:textColor="@color/white"
-                        />
-                    <TextView
+                        android:textSize="@dimen/a_meeting_time" />
+
+                    <com.hskj.meettingsys.utils.MarqueeTextView
                         android:id="@+id/dataa"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:singleLine="true"
                         android:layout_marginTop="10dp"
                         android:gravity="center"
+                        android:ellipsize="marquee"
+                        android:singleLine="true"
                         android:text="2019/07/24     星期五"
-                        android:textSize="@dimen/a_meeting_data"
                         android:textColor="@color/white"
-                        />
+                        android:textSize="@dimen/a_meeting_data" />
 
                 </LinearLayout>
-
-                <ImageView
-                    android:id="@+id/action_image_a"
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:background="@color/space_line"
+                    />
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="2"
-                    android:src="@drawable/laishui"
-                    android:scaleType="centerCrop"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="@color/back_A2"
                     >
 
-                </ImageView>
+                    <GridView
+                        android:id="@+id/weather_a"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:numColumns="3"
+                        android:scrollbars="none"
+                        />
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

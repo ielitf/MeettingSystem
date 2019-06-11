@@ -2,11 +2,11 @@ package com.hskj.meettingsys.bean;
 
 public class MqttMeetingListBean {
     private String bookPerson;//预订人
-    private String isOpen;//是否公开  字符串true:公开 false:未公开
+    private String isOpen;//是否公开  字符串1:公开 0:未公开
     private long endDate;
     private String name;//会议主题名称
     private int id;//会议ID
-    private String templateId;// 0 代表模板A   1代表模板2
+    private String templateId;// 1 代表模板A   2代表模板B
     private long startDate; //日期
 
     public String getBookPerson() {

@@ -1,27 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <dimen name="a_meeting_room_name">25sp</dimen>
-    <dimen name="a_meeting_cur_name">25sp</dimen>
-    <dimen name="a_meeting_cur_time">20sp</dimen>
-    <dimen name="a_meeting_cur_bumen">20sp</dimen>
-    <dimen name="a_meeting_time">25sp</dimen>
-    <dimen name="a_meeting_data">10sp</dimen>
-    <dimen name="a_meeting_list1">15sp</dimen>
-    <dimen name="a_meeting_list2">15sp</dimen>
+    <dimen name="a_meeting_room_name">35sp</dimen>
+    <dimen name="a_meeting_cur_name">35sp</dimen>
+    <dimen name="a_meeting_cur_time">25sp</dimen>
+    <dimen name="a_meeting_cur_bumen">25sp</dimen>
+    <dimen name="a_meeting_time">40sp</dimen>
+    <dimen name="a_meeting_data">20sp</dimen>
+    <dimen name="a_meeting_list1">18sp</dimen>
+    <dimen name="a_meeting_list2">18sp</dimen>
 
-    <dimen name="a_meeting_list_tap">15sp</dimen>
-    <dimen name="a_meeting_list_item_text">10sp</dimen>
+    <dimen name="meeting_list_tap">18sp</dimen>
+    <dimen name="meeting_list_item_text">18sp</dimen>
+    <dimen name="weather_list_item_text">14sp</dimen>
 
 
-    <dimen name="b_meeting_room_name">30sp</dimen>
-    <dimen name="b_meeting_cur_name">25sp</dimen>
-    <dimen name="b_meeting_cur_time">20sp</dimen>
-    <dimen name="b_meeting_cur_bumen">20sp</dimen>
-    <dimen name="b_meeting_time">20sp</dimen>
-    <dimen name="b_meeting_data">10sp</dimen>
-    <dimen name="b_meeting_list1">30sp</dimen>
-    <dimen name="b_meeting_list2">10sp</dimen>
+    <dimen name="b_meeting_room_name">40sp</dimen>
+    <dimen name="b_meeting_cur_name">35sp</dimen>
+    <dimen name="b_meeting_cur_time">25sp</dimen>
+    <dimen name="b_meeting_cur_bumen">25sp</dimen>
+    <dimen name="b_meeting_time">30sp</dimen>
+    <dimen name="b_meeting_data">15sp</dimen>
+    <dimen name="b_meeting_list1">35sp</dimen>
+    <dimen name="b_meeting_list2">15sp</dimen>
 
 
     <dimen name="text_margin">16dp</dimen>

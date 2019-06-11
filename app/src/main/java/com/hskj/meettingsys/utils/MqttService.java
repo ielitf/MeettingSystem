@@ -24,6 +24,7 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import java.util.concurrent.Executors;
@@ -40,6 +41,7 @@ public class MqttService extends Service {
 //    public static final String BROKER_URL = "tcp://172.16.30.185:1883";//zzx
 //    public static final String BROKER_URL = "tcp://172.16.30.234:1883";//东东
     public static final String BROKER_URL = "tcp://172.16.30.226:1883";//浩浩
+    public static final String LOCAL_URL = "tcp://192.168.10.120:1883";//浩浩
     //    public static final String TOPIC = "com.ceiv.hw.communication.rx5";//东东
     public static  String TOPIC_MEETING_LIST = "";//浩浩
     public static  String TOPIC_MEETING_CUR = "";//浩浩
@@ -100,11 +102,11 @@ public class MqttService extends Service {
         TOPIC_MEETING_CUR = roomNum + "_currtMeet";
         topicFilters = new String[]{TOPIC_MEETING_CUR,TOPIC_MEETING_LIST};
         qos = new int[]{0,1};
-        Log.i("===当前会议室编号：", roomNum+"");
+        LogUtil.i("===当前会议室编号：", roomNum+"");
 
         // todo 设置主题
         try {
-            mqttClient = new MqttClient(BROKER_URL, clientId, new MemoryPersistence());
+            mqttClient = new MqttClient(LOCAL_URL, clientId, new MemoryPersistence());
             //MQTT的连接设置
             options = new MqttConnectOptions();
             //设置是否清空session
@@ -114,8 +116,8 @@ public class MqttService extends Service {
             //设置连接的密码
             options.setPassword(passWord.toCharArray());
             // 设置超时时间 单位为秒
-            options.setConnectionTimeout(30);
-            options.setKeepAliveInterval(30);
+            options.setConnectionTimeout(60);
+            options.setKeepAliveInterval(60);
             options.setAutomaticReconnect(true);//设置自动重连
             mqttClient.setCallback(new MqttCallback() {
                 @Override
@@ -128,8 +130,8 @@ public class MqttService extends Service {
 
                 @Override
                 public void messageArrived(String topic, MqttMessage message) throws Exception {
-                    Log.i("===", "接收消息主题 : " + topic);
-                    Log.i("===", "接收消息Qos : " + message.getQos());
+                    LogUtil.i("===", "接收消息主题 : " + topic);
+                    LogUtil.i("===", "接收消息Qos : " + message.getQos());
                     String str = new String(message.getPayload());
                     mCallBack.setData(topic, str);
                 }
@@ -137,7 +139,7 @@ public class MqttService extends Service {
                 @Override
                 public void deliveryComplete(IMqttDeliveryToken token) {
                     long messageId = token.getMessageId();
-                    Log.e(TAG, "messageId=:" + messageId);
+                    LogUtil.e("===", "messageId=:" + messageId);
                 }
             });
         } catch (Exception e) {
@@ -164,7 +166,23 @@ public class MqttService extends Service {
             connect();
         }
     }
+    public  void publish(String topic ,String jsonString,int qos) {
+        try {
+            if (mqttClient!=null) {
+                MqttMessage message = new MqttMessage();
+                message.setQos(qos);
+//                message.setRetained(isRetained);
+                message.setPayload(jsonString.getBytes());
+                mqttClient.publish(topic, message);
+                LogUtil.d("===","发送topic : "+topic+"；发送的消息msg："+jsonString);
+            }
+        } catch (MqttPersistenceException e) {
+            e.printStackTrace();
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
 
+    }
     /*连接服务器，并订阅消息主题*/
     private void connect() {
         new Thread(new Runnable() {
@@ -173,25 +191,14 @@ public class MqttService extends Service {
                 try {
                     mqttClient.connect(options);
 //                    mqttClient.subscribe(TOPIC_MEETING_CUR);
-                    mqttClient.subscribe(topicFilters,qos);
+//                    mqttClient.subscribe(TOPIC_MEETING_LIST);
+                    mqttClient.subscribe(topicFilters);
+//                    mqttClient.subscribe(topicFilters,qos);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }).start();
-
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    mqttClient.connect(options);
-////                    mqttClient.subscribe(TOPIC_MEETING_LIST);
-//                    mqttClient.subscribe(TOPIC_MEETING_CUR);
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }).start();
     }
 
     /**
@@ -215,10 +222,10 @@ public class MqttService extends Service {
     private final BroadcastReceiver mConnectivityReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.i("BroadcastReceiver", "Connectivity Changed...");
+            LogUtil.i("BroadcastReceiver", "Connectivity Changed...");
             if (!isNetworkAvailable()) {
-                Toast.makeText(context, "网络错误", Toast.LENGTH_SHORT).show();
-                scheduler.shutdownNow();
+                Toast.makeText(context, "网络连接不可用，请检查网络", Toast.LENGTH_SHORT).show();
+//                scheduler.shutdownNow();//如果当前无网络，调用此方法，此时打开app会崩溃，
             } else {
                 startReconnect();
             }

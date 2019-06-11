@@ -3,7 +3,7 @@ package com.hskj.meettingsys.bean;
 public class MqttMeetingCurrentBean {
     private String department;//部门
     private long endDate;//结束时间
-    private String isOpen;//是否公开  字符串true:公开 false:未公开
+    private String isOpen;//是否公开  字符串1:公开 0:未公开
     private int meetingId;
     private String meetingName;//会议主题名称
     private String roomName;//会议室名称

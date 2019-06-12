@@ -75,16 +75,20 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
             switch (msg.what) {
                 case 1:
                     if (myCurMeetingList.size() > 0) {
-                        Toast.makeText(context, "当前会议信息已更新", Toast.LENGTH_SHORT).show();
                         //设置当前会议数据
                         roomName.setText(myCurMeetingList.get(0).getRoomName());
-                        meetingName.setText(myCurMeetingList.get(0).getMeetingName());
                         String startTime = DateTimeUtil.getInstance().transTimeToHHMM(myCurMeetingList.get(0).getStartDate());
                         String endTime = DateTimeUtil.getInstance().transTimeToHHMM(myCurMeetingList.get(0).getEndDate());
                         meetingTime.setText(startTime + "-" + endTime);
-                        meeting_bumen.setText(myCurMeetingList.get(0).getDepartment());
+                        if (myCurMeetingList.get(0).getIsOpen().equals("1")) {
+                            meetingName.setText(myCurMeetingList.get(0).getMeetingName());
+                            meeting_bumen.setText(myCurMeetingList.get(0).getDepartment());
+                        } else {
+                            meetingName.setText("未公开");
+                            meeting_bumen.setText("");
+                        }
                     } else {
-                        roomName.setText("XX会议室");
+                        roomName.setText("会议室");
                         meetingName.setText("当前无会议");
                         meetingTime.setText("");
                         meeting_bumen.setText("");
@@ -92,7 +96,6 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
                     break;
                 case 2:
                     if (myMeetingList.size() > 0) {
-                        Toast.makeText(context, "今日会议列表信息已更新", Toast.LENGTH_SHORT).show();
                         if (adapter == null) {
                             adapter = new MeetingAdapter(context, myMeetingList);
                             meeting_listView.setAdapter(adapter);
@@ -181,14 +184,13 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
                     @Override
                     public void onSuccess(String s, Call call, Response response) {
                         if(response.code() == 200){
-                            LogUtil.w("-----", s);
                             try {
                                 JSONObject jsonObject = new JSONObject(s);
                                 String content = jsonObject.getString("data");
+                                weatherList.clear();
                                 weatherList.addAll(JSON.parseArray(content, WeatherBean.class));
                                 weatherAdapter = new WeatherAdapter(context,weatherList);
                                 gridView.setAdapter(weatherAdapter);
-                                LogUtil.w("-----", weatherList.toString());
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }

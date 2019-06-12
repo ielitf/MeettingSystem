@@ -285,17 +285,32 @@
                     android:layout_height="0dp"
                     android:layout_weight="2"
                     android:orientation="vertical"
-                    android:gravity="center"
                     android:background="@color/back_A2"
                     >
-
-                    <GridView
-                        android:id="@+id/weather_a"
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:id="@+id/weather_city_a"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:numColumns="3"
-                        android:scrollbars="none"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginTop="5dp"
+                        android:text="当前城市："
+                        android:textSize="10sp"
+                        android:textColor="@color/white"
+                        android:visibility="gone"
                         />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        >
+                        <GridView
+                            android:id="@+id/weather_a"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:numColumns="3"
+                            android:scrollbars="none"
+                            />
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

@@ -77,7 +77,6 @@ public class AFragment extends Fragment implements OnGetCurrentDateTimeListener,
             switch (msg.what) {
                 case 1:
                     if (myCurMeetingList.size() > 0) {
-                        Toast.makeText(context, "当前会议信息已更新", Toast.LENGTH_SHORT).show();
                         //设置当前会议数据
                         roomName.setText(myCurMeetingList.get(0).getRoomName());
                         String startTime = DateTimeUtil.getInstance().transTimeToHHMM(myCurMeetingList.get(0).getStartDate());
@@ -99,7 +98,6 @@ public class AFragment extends Fragment implements OnGetCurrentDateTimeListener,
                     break;
                 case 2:
                     if (myMeetingList.size() > 0) {
-                        Toast.makeText(context, "今日会议列表信息已更新", Toast.LENGTH_SHORT).show();
                         if (adapter == null) {
                             adapter = new MeetingAdapter(context, myMeetingList);
                             meeting_listView.setAdapter(adapter);
@@ -189,7 +187,6 @@ public class AFragment extends Fragment implements OnGetCurrentDateTimeListener,
                     @Override
                     public void onSuccess(String s, Call call, Response response) {
                         if (response.code() == 200) {
-                            LogUtil.w("-----", s);
                             try {
                                 JSONObject jsonObject = new JSONObject(s);
                                 String content = jsonObject.getString("data");
@@ -197,8 +194,6 @@ public class AFragment extends Fragment implements OnGetCurrentDateTimeListener,
                                 weatherList.addAll(JSON.parseArray(content, WeatherBean.class));
                                 weatherAdapter = new WeatherAdapter(context, weatherList);
                                 gridView.setAdapter(weatherAdapter);
-                                Toast.makeText(context,"天气数据已更新",Toast.LENGTH_SHORT).show();
-                                LogUtil.w("-----", weatherList.toString());
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -240,7 +235,6 @@ public class AFragment extends Fragment implements OnGetCurrentDateTimeListener,
             if (strJsonMessage != null) {
                 myMeetingList = JSON.parseArray(strJsonMessage, MqttMeetingListBean.class);
                 LogUtil.w("*****MeetingList.size", myMeetingList.size() + "");
-
                 if (myMeetingList.size() > 0) {
                     Message msg = new Message();
                     msg.what = 2;
@@ -259,14 +253,6 @@ public class AFragment extends Fragment implements OnGetCurrentDateTimeListener,
         meetingTime = view.findViewById(R.id.current_meeting_time_a);
         meeting_bumen = view.findViewById(R.id.current_meeting_bm_a);
         gridView = view.findViewById(R.id.weather_a);
-    }
-
-    private void initWeatherData() {
-        for (int i = 0; i < WeatherData.weather_day.length; i++) {
-            jiaWeatherList.add(new JiaWeatherBean(WeatherData.weather_day[i], WeatherData.weather_icon[i], WeatherData.weather_tem_h[i], WeatherData.weather_tem_l[i]));
-        }
-//        weatherAdapter = new WeatherAdapter(context,jiaWeatherList);
-//        gridView.setAdapter(weatherAdapter);
     }
 
     @Override

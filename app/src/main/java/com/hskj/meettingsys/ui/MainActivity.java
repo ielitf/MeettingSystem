@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
     private boolean aBoolean = true;
     private List<MqttMeetingListBean> meetingList = new ArrayList<>();
     private static String topic,strMessage;
-    private String templateId;// 0 代表模板A   1代表模板2
+    private int templateId;// 0 代表模板A   1代表模板2
     private MqttService mqttService = new MqttService();
     private boolean isFirst = true;
 
@@ -71,7 +71,6 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
         // 去除标题栏
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
-        Toast.makeText(this,"欢迎使用",Toast.LENGTH_SHORT).show();
         templateId = SharePreferenceManager.getMeetingMuBanType();//获取存储的磨板类型，默认值：“1”
         if (!isServiceRunning(String.valueOf(MqttService.class))) {
             startService(new Intent(this, MqttService.class));
@@ -95,12 +94,17 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
 
         manager = getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
-        if (templateId.equals("1")) {
-            mContent = aFragment;
-        }else {
+        transaction.add(R.id.viewPager, aFragment);
+        FragmentTransaction transaction2 = manager.beginTransaction();
+        transaction2.add(R.id.viewPager, bFragment);
+        LogUtil.i("====模板",+templateId+"");
+        if (templateId ==2 ) {
             mContent = bFragment;
+            transaction2.show(bFragment).commit();
+        }else {
+            mContent = aFragment;
+            transaction.show(aFragment).commit();
         }
-        transaction.add(R.id.viewPager, mContent).commit();
     }
 
     @Override
@@ -113,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
                 SharePreferenceManager.setMeetingCurrentData(strMessage);//存储当前会议，当只收到今日会议列表时，用于从缓存中读取当前会议
 //                SharePreferenceManager.setMeetingTodayData("[{\"bookPerson\":\"zhangsan\",\"endDate\":1559024251000,\"id\":161,\"isOpen\":\"2\",\"name\":\"慧电科技会议室\",\"startDate\":1559001600000,\"templateId\":2}]");//存储当前会议，当只收到今日会议列表时，用于从缓存中读取当前会议
                 templateId = SharePreferenceManager.getMeetingMuBanType();//读取存储的模板类型
-                if (templateId.equals("2")) {//模板类型B
+                if (templateId == 2) {//模板类型B
 //                    transaction.replace(R.id.viewPager, BFragment.newInstance(topic, strMessage, SharePreferenceManager.getMeetingTodayData())).commit();
                     switchContent(bFragment);
                     fragmentCallBack.TransData(topic,strMessage);
@@ -132,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
                 meetingList = JSON.parseArray(strMessage, MqttMeetingListBean.class);
                 templateId = meetingList.get(0).getTemplateId();
                 SharePreferenceManager.setMeetingMuBanType(templateId);//将模板类型存到本地缓存中
-                if (templateId.equals("2")) {//模板B
+                if (templateId == 2) {//模板B
                     switchContent(bFragment);
                     fragmentCallBack.TransData(topic,strMessage);
                 } else {//模板a
@@ -143,40 +147,6 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
         }
     }
 
-    private void getWheatherData() {
-        OkGo.get(K780Utils.WEATHER_URL).cacheKey(K780Utils.WEATHER_URL).cacheMode(CacheMode.DEFAULT).execute(new StringCallback() {
-            @Override
-            public void onSuccess(String s, Call call, Response response) {
-                LogUtil.i("=====response", response.toString());
-                LogUtil.i("=====s", s);
-                if (response.code() == 200) {
-                    try {
-                        JSONObject obj = new JSONObject(s);
-                        JSONObject result = obj.getJSONObject("result");
-
-                        String citynm = result.getString("citynm");
-                        String temperature = result.getString("temperature");
-                        String temperature_curr = result.getString("temperature_curr");
-                        String weather_curr = result.getString("weather_curr");
-                        String weather_icon = result.getString("weather_icon");
-                        LogUtil.i("=====result", citynm);
-                        LogUtil.i("=====result", temperature);
-                        LogUtil.i("=====result", temperature_curr);
-                        LogUtil.i("=====result", weather_curr);
-                        LogUtil.i("=====result", weather_icon);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            @Override
-            public void onError(Call call, Response response, Exception e) {
-                super.onError(call, response, e);
-                LogUtil.i("=====天气获取失败", e.toString());
-            }
-        });
-    }
 
     @Override
     protected void onDestroy() {
@@ -200,7 +170,6 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.ceshi:
-                FragmentTransaction transaction = manager.beginTransaction();
                 if (aBoolean) {//  002_currtMeet   002_meetList
                     switchContent(bFragment);
                     aBoolean = false;
@@ -225,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
                 break;
         }
     }
-    private void switchContent(Fragment to) {
+    private void switchContent(Fragment to ) {
         if (mContent != to) {
             FragmentTransaction transaction = manager.beginTransaction();
             if (!to.isAdded()) { // 判断是否被add过
@@ -241,37 +210,4 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
     public static void setFragmentCallBack(FragmentCallBack callBack){
         fragmentCallBack = callBack;
     }
-////    private class MyTask extends AsyncTask<Integer, Void, Weather> {
-////
-////        // 进度条对话框
-////        ProgressDialog dialog;
-////
-////        @Override
-////        protected void onPreExecute() {
-//////            dialog = new ProgressDialog(MainActivity.this);
-//////            dialog.setTitle("天气数据");
-//////            dialog.setMessage("正在下载...");
-//////            // 显示对话框
-//////            dialog.show();
-////        }
-////
-////        @Override
-////        protected Weather doInBackground(Integer... params) {
-////            return K780Utils.getOneDayWeather(params[0]);
-////        }
-////
-////        @Override
-////        protected void onPostExecute(Weather result) {
-////            if(result == null) {
-////                Toast.makeText(MainActivity.this, "数据获取失败", Toast.LENGTH_SHORT).show();
-////            } else {
-////
-////                LogUtil.i("=====result",result.toString());
-////
-////            }
-////            // 关闭对话框
-//////            dialog.cancel();
-////        }
-////
-////    }
 }

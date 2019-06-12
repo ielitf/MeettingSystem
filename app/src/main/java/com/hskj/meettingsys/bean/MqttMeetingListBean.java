@@ -2,12 +2,13 @@ package com.hskj.meettingsys.bean;
 
 public class MqttMeetingListBean {
     private String bookPerson;//预订人
-    private String isOpen;//是否公开  字符串1:公开 0:未公开
     private long endDate;
-    private String name;//会议主题名称
     private int id;//会议ID
-    private String templateId;// 1 代表模板A   2代表模板B
+    private String isOpen;//是否公开  字符串1:公开 0:未公开
+    private String name;//会议主题名称
+    private String roomName;//会议室名称
     private long startDate; //日期
+    private int templateId;// 1 代表模板A   2代表模板B
 
     public String getBookPerson() {
         return bookPerson;
@@ -15,14 +16,6 @@ public class MqttMeetingListBean {
 
     public void setBookPerson(String bookPerson) {
         this.bookPerson = bookPerson;
-    }
-
-    public String getIsOpen() {
-        return isOpen;
-    }
-
-    public void setIsOpen(String isOpen) {
-        this.isOpen = isOpen;
     }
 
     public long getEndDate() {
@@ -33,14 +26,6 @@ public class MqttMeetingListBean {
         this.endDate = endDate;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public int getId() {
         return id;
     }
@@ -49,12 +34,28 @@ public class MqttMeetingListBean {
         this.id = id;
     }
 
-    public String getTemplateId() {
-        return templateId;
+    public String getIsOpen() {
+        return isOpen;
     }
 
-    public void setTemplateId(String templateId) {
-        this.templateId = templateId;
+    public void setIsOpen(String isOpen) {
+        this.isOpen = isOpen;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getRoomName() {
+        return roomName;
+    }
+
+    public void setRoomName(String roomName) {
+        this.roomName = roomName;
     }
 
     public long getStartDate() {
@@ -65,16 +66,25 @@ public class MqttMeetingListBean {
         this.startDate = startDate;
     }
 
+    public int getTemplateId() {
+        return templateId;
+    }
+
+    public void setTemplateId(int templateId) {
+        this.templateId = templateId;
+    }
+
     @Override
     public String toString() {
         return "MqttMeetingListBean{" +
                 "bookPerson='" + bookPerson + '\'' +
-                ", isOpen='" + isOpen + '\'' +
                 ", endDate=" + endDate +
-                ", name='" + name + '\'' +
                 ", id=" + id +
-                ", templateId='" + templateId + '\'' +
+                ", isOpen='" + isOpen + '\'' +
+                ", name='" + name + '\'' +
+                ", roomName='" + roomName + '\'' +
                 ", startDate=" + startDate +
+                ", templateId=" + templateId +
                 '}';
     }
 }

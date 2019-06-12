@@ -45,17 +45,17 @@ public class SharePreferenceManager {
      * 当前会议显示的模板类型
      */
     private static final String MEETING_MUBAN_TYPE = "meeting_mubant_type";
-    public static void setMeetingMuBanType(String jsonStr) {
+    public static void setMeetingMuBanType(int jsonStr) {
         if (null != sp) {
-            sp.edit().putString(MEETING_MUBAN_TYPE, jsonStr).commit();
+            sp.edit().putInt(MEETING_MUBAN_TYPE, jsonStr).commit();
         }
     }
 
-    public static String getMeetingMuBanType() {
+    public static int getMeetingMuBanType() {
         if (null != sp) {
-            return sp.getString(MEETING_MUBAN_TYPE, "1");
+            return sp.getInt(MEETING_MUBAN_TYPE, 1);
         }
-        return null;
+        return 1;
     }
     /**
      * 今日会议列表

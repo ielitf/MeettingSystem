@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
     private int kk;
     private boolean aBoolean = true;
     private List<MqttMeetingListBean> meetingList = new ArrayList<>();
-    private static String topic,strMessage;
+    private  String topic,strMessage;
     private int templateId;// 0 代表模板A   1代表模板2
     private MqttService mqttService = new MqttService();
     private boolean isFirst = true;
@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
         FragmentTransaction transaction2 = manager.beginTransaction();
         transaction2.add(R.id.viewPager, bFragment);
         LogUtil.i("====模板",+templateId+"");
-        if (templateId ==2 ) {
+        if (templateId ==1 ) {
             mContent = bFragment;
             transaction2.show(bFragment).commit();
         }else {
@@ -109,20 +109,18 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
 
     @Override
     public void setData(String topic, String strMessage) {
+        this.topic = topic;
+        this.strMessage = strMessage;
         LogUtil.w("============Main", "topic:" + topic + ";----strMessage:" + strMessage);
-        FragmentTransaction transaction = manager.beginTransaction();
         if (MqttService.TOPIC_MEETING_CUR.equals(topic)) {
             //todo   当前会议
             if (!"[]".equals(strMessage) && strMessage !=null && !TextUtils.isEmpty(strMessage)) {
                 SharePreferenceManager.setMeetingCurrentData(strMessage);//存储当前会议，当只收到今日会议列表时，用于从缓存中读取当前会议
-//                SharePreferenceManager.setMeetingTodayData("[{\"bookPerson\":\"zhangsan\",\"endDate\":1559024251000,\"id\":161,\"isOpen\":\"2\",\"name\":\"慧电科技会议室\",\"startDate\":1559001600000,\"templateId\":2}]");//存储当前会议，当只收到今日会议列表时，用于从缓存中读取当前会议
                 templateId = SharePreferenceManager.getMeetingMuBanType();//读取存储的模板类型
                 if (templateId == 2) {//模板类型B
-//                    transaction.replace(R.id.viewPager, BFragment.newInstance(topic, strMessage, SharePreferenceManager.getMeetingTodayData())).commit();
                     switchContent(bFragment);
                     fragmentCallBack.TransData(topic,strMessage);
                 } else {
-//                    transaction.replace(R.id.viewPager,AFragment.newInstance(topic,strMessage,SharePreferenceManager.getMeetingTodayData())).commit();
                     switchContent(aFragment);
                     fragmentCallBack.TransData(topic,strMessage);
                 }

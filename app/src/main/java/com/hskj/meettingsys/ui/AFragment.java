@@ -215,10 +215,10 @@ public class AFragment extends Fragment implements OnGetCurrentDateTimeListener,
 
     @Override
     public void TransData(String topic, String strJsonMessage) {
-        LogUtil.w("========AFragment", "topic:" + topic + ";----MqttService.TOPIC_MEETING_CUR:" + MqttService.TOPIC_MEETING_CUR + ";----strMessage:" + strJsonMessage);
+        LogUtil.w("========AFragment", "topic:" + topic + ";----strMessage:" + strJsonMessage);
 
         if (topic.equals(MqttService.TOPIC_MEETING_CUR)) {//当前会议
-            LogUtil.w("=======", "当前会议");
+            LogUtil.w("=======", "当前会议主题："+ MqttService.TOPIC_MEETING_CUR);
             if (strJsonMessage != null) {
                 myCurMeetingList = JSON.parseArray(strJsonMessage, MqttMeetingCurrentBean.class);
                 LogUtil.w("*****CurMeeting.size()", myCurMeetingList.size() + "");
@@ -231,7 +231,7 @@ public class AFragment extends Fragment implements OnGetCurrentDateTimeListener,
         }
 
         if (topic.equals(MqttService.TOPIC_MEETING_LIST)) {//今日会议
-            LogUtil.w("=======", "今日会议");
+            LogUtil.w("=======", "今日会议主题:"+ MqttService.TOPIC_MEETING_LIST);
             if (strJsonMessage != null) {
                 myMeetingList = JSON.parseArray(strJsonMessage, MqttMeetingListBean.class);
                 LogUtil.w("*****MeetingList.size", myMeetingList.size() + "");

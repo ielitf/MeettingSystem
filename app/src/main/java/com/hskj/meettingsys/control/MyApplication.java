@@ -13,8 +13,11 @@ public class MyApplication extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		SDCardUtils.writeTxt("001");
 		SharePreferenceManager.init(getApplicationContext(), SHARED_PREFERENCE_NAME);
+		if(SharePreferenceManager.getIsFirstUse()){
+			SDCardUtils.writeTxt("001");
+			SharePreferenceManager.setIsFirstUse(false);
+		}
 		//全局初始化
 		OkGo.init(this);
 		OkGo.getInstance().setConnectTimeout(3000)
@@ -24,4 +27,6 @@ public class MyApplication extends Application {
 //				.setCacheTime(CacheEntity.CACHE_NEVER_EXPIRE)
 				.setRetryCount(3);
 	}
+
+
 }

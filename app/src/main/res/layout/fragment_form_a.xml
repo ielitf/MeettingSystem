@@ -221,14 +221,15 @@
                     android:textSize="@dimen/a_meeting_room_name" />
 
                 <TextView
+                    android:id="@+id/room_num"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/px15_dp"
                     android:gravity="center"
-                    android:text="会议室"
+                    android:text="会议室编号："
                     android:textColor="@color/white"
-                    android:textSize="@dimen/px45_sp"
-                    android:visibility="gone" />
+                    android:textSize="10sp"
+                    android:visibility="visible" />
 
             </LinearLayout>
             <View

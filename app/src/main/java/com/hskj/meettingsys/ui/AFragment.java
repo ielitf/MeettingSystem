@@ -31,6 +31,7 @@ import com.hskj.meettingsys.utils.DateTimeUtil;
 import com.hskj.meettingsys.utils.IPAddressUtils;
 import com.hskj.meettingsys.utils.LogUtil;
 import com.hskj.meettingsys.utils.MqttService;
+import com.hskj.meettingsys.utils.SDCardUtils;
 import com.hskj.meettingsys.utils.TimeThread;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
@@ -58,7 +59,7 @@ public class AFragment extends Fragment implements OnGetCurrentDateTimeListener,
     private List<MqttMeetingCurrentBean> myCurMeetingList = new ArrayList<>();
     private MeetingAdapter adapter = null;
     private MeetingAdapterA jiaAdapter = null;
-    private TextView timeTv, dataTv, roomName, meetingName, meetingTime, meeting_bumen;
+    private TextView timeTv, dataTv, roomName, meetingName, meetingTime, meeting_bumen,room_num;
     private DateTimeUtil dateTimeUtil;
     private TimeThread timeThread;
     private long delayTime = 3000;//listView列表比较多时，自动滚动的时间间隔
@@ -233,6 +234,8 @@ public class AFragment extends Fragment implements OnGetCurrentDateTimeListener,
     }
 
     private void initViews(View view) {
+        room_num = view.findViewById(R.id.room_num);
+        room_num.setText("当前会议室编号："+SDCardUtils.readTxt()+"");
         meeting_listView = view.findViewById(R.id.meeting_list_a);
         timeTv = view.findViewById(R.id.timea);
         dataTv = view.findViewById(R.id.dataa);

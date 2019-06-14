@@ -41,14 +41,14 @@ public class MqttService extends Service {
 //    public static final String BROKER_URL = "tcp://172.16.30.185:1883";//zzx
 //    public static final String BROKER_URL = "tcp://172.16.30.234:1883";//东东
     public static final String BROKER_URL = "tcp://172.16.30.226:1883";//浩浩
-    public static final String LOCAL_URL = "tcp://192.168.10.120:1883";//浩浩
+    public static final String LOCAL_URL = "tcp://192.168.10.2:1883";//浩浩
     //    public static final String TOPIC = "com.ceiv.hw.communication.rx5";//东东
     public static  String TOPIC_MEETING_LIST = "";//浩浩
     public static  String TOPIC_MEETING_CUR = "";//浩浩
     //    private String userName = "dongdongjia";//东东
 //    private String passWord = "dongdongjia";//东东
-    private static String userName = "easton";
-    private static String passWord = "easton";
+    private static String userName = "atv";
+    private static String passWord = "atv";
     private static String roomNum;//会议室编号
 
     public MqttClient mqttClient;
@@ -130,9 +130,9 @@ public class MqttService extends Service {
 
                 @Override
                 public void messageArrived(String topic, MqttMessage message) throws Exception {
-                    LogUtil.i("===", "接收消息主题 : " + topic);
-                    LogUtil.i("===", "接收消息Qos : " + message.getQos());
+                    LogUtil.i("===", "接收消息主题 : " + topic+";接收消息Qos :"  + message.getQos());
                     String str = new String(message.getPayload());
+                    LogUtil.i("===MqttService", "topic:" + topic + ";----message:" + str);
                     mCallBack.setData(topic, str);
                 }
 

@@ -24,7 +24,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-        <activity android:name=".ui.AFragmentActivity"></activity>
         <activity android:name=".ui.LauncherActivity" />
         <activity android:name=".ui.MainActivity">
             <intent-filter>

@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,9 +12,9 @@ import android.widget.AbsListView;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.hskj.meettingsys.K780.K780Utils;
 import com.hskj.meettingsys.R;
 import com.hskj.meettingsys.adapter.MeetingAdapter;
 import com.hskj.meettingsys.adapter.MeetingAdapterA;
@@ -27,7 +26,8 @@ import com.hskj.meettingsys.bean.MqttMeetingCurrentBean;
 import com.hskj.meettingsys.bean.MqttMeetingListBean;
 import com.hskj.meettingsys.bean.WeatherBean;
 import com.hskj.meettingsys.bean.WeatherData;
-import com.hskj.meettingsys.listener.FragmentCallBack;
+import com.hskj.meettingsys.listener.FragmentCallBackA;
+import com.hskj.meettingsys.listener.FragmentCallBackB;
 import com.hskj.meettingsys.listener.OnGetCurrentDateTimeListener;
 import com.hskj.meettingsys.utils.DateTimeUtil;
 import com.hskj.meettingsys.utils.IPAddressUtils;
@@ -48,7 +48,7 @@ import java.util.TimerTask;
 import okhttp3.Call;
 import okhttp3.Response;
 
-public class BFragment extends Fragment implements OnGetCurrentDateTimeListener, FragmentCallBack {
+public class BFragment extends Fragment implements OnGetCurrentDateTimeListener, FragmentCallBackB {
     private GridView gridView;
     private WeatherAdapter weatherAdapter;
     private Context context;
@@ -82,7 +82,7 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
                         meetingTime.setText(startTime + "-" + endTime);
                         if (myCurMeetingList.get(0).getIsOpen().equals("1")) {
                             meetingName.setText(myCurMeetingList.get(0).getMeetingName());
-                            meeting_bumen.setText(myCurMeetingList.get(0).getDepartment());
+                            meeting_bumen.setText("");
                         } else {
                             meetingName.setText("未公开");
                             meeting_bumen.setText("");
@@ -148,7 +148,7 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
         timeThread = new TimeThread(BFragment.this);
         timeThread.start();
         loadWeatherData();
-        MainActivity.setFragmentCallBack(this);
+        MainActivity.setFragmentCallBackB(this);
 
         listScrollUp();
         meeting_listView.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -175,27 +175,28 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
         timingAgain();
         ip = IPAddressUtils.getAndroidIp(context);
         LogUtil.i("===",ip);
-        OkGo.get("https://www.tianqiapi.com/api/?")
-                .params("version","v1")
-//                .params("cityid","101090201")
-//                .params("city","北京")
-                .params("ip",ip)
+        OkGo.get("http://api.k780.com:88/?")
+                .params("app", "weather.future")
+                .params("weaid", ip)
+                .params("appkey", K780Utils.APPKEY)
+                .params("sign",K780Utils.SIGN)
+                .params("format","json")
                 .execute(new StringCallback() {
                     @Override
                     public void onSuccess(String s, Call call, Response response) {
-                        if(response.code() == 200){
+                        LogUtil.w("=========天气",s);
+                        if (response.code() == 200) {
                             try {
                                 JSONObject jsonObject = new JSONObject(s);
-                                String content = jsonObject.getString("data");
+                                String content = jsonObject.getString("result");
                                 weatherList.clear();
                                 weatherList.addAll(JSON.parseArray(content, WeatherBean.class));
-                                weatherAdapter = new WeatherAdapter(context,weatherList);
+                                weatherAdapter = new WeatherAdapter(context, weatherList);
                                 gridView.setAdapter(weatherAdapter);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
                         }
-
                     }
                 });
     }
@@ -210,33 +211,22 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
         meeting_listView.setAdapter(jiaAdapter);
     }
     @Override
-    public void TransData(String topic, String strJsonMessage) {
-        LogUtil.w("========AFragment", "topic:" + topic +";----MqttService.TOPIC_MEETING_CUR:" + MqttService.TOPIC_MEETING_CUR +";----strMessage:" + strJsonMessage);
-
+    public void TransDataB(String topic, List mList) {
+        LogUtil.w("========BFragment", "topic:" + topic + ";----mList:" + mList.toString());
         if (topic.equals(MqttService.TOPIC_MEETING_CUR)) {//当前会议
-            LogUtil.w("=======", "当前会议");
-            if (strJsonMessage != null) {
-                myCurMeetingList = JSON.parseArray(strJsonMessage, MqttMeetingCurrentBean.class);
-                LogUtil.w("*****CurMeeting.size()", myCurMeetingList.size()+"");
-                if (myCurMeetingList.size() > 0) {
-                    Message msg = new Message();
-                    msg.what = 1;
-                    handler.sendMessage(msg);
-                }
+            myCurMeetingList = mList;
+            if (myCurMeetingList.size() > 0) {
+                Message msg = new Message();
+                msg.what = 1;
+                handler.sendMessage(msg);
             }
         }
-
         if (topic.equals(MqttService.TOPIC_MEETING_LIST)) {//今日会议
-            LogUtil.w("=======", "今日会议");
-            if (strJsonMessage != null) {
-                myMeetingList = JSON.parseArray(strJsonMessage, MqttMeetingListBean.class);
-                LogUtil.w("*****MeetingList.size", myMeetingList.size()+"");
-
-                if (myMeetingList.size() > 0) {
-                    Message msg = new Message();
-                    msg.what = 2;
-                    handler.sendMessage(msg);
-                }
+            myMeetingList = mList;
+            if (myMeetingList.size() > 0) {
+                Message msg = new Message();
+                msg.what = 2;
+                handler.sendMessage(msg);
             }
         }
     }

@@ -7,51 +7,66 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import com.hskj.meettingsys.R;
 import com.hskj.meettingsys.bean.MqttMeetingListBean;
+import com.hskj.meettingsys.bean.WeatherBean;
 import com.hskj.meettingsys.utils.DateTimeUtil;
 
 import java.util.List;
 
-public class MeetingAdapter extends MyBaseAdapter<MqttMeetingListBean> {
+public class MeetingAdapter extends MyBaseAdapter2<MqttMeetingListBean> {
     private LayoutInflater inflater;
     private Context context;
     public MeetingAdapter(Context context, List<MqttMeetingListBean> mData) {
-        super(context, mData);
+        super(mData, context);
         this.context = context;
         inflater = LayoutInflater.from(context);
     }
-
     @Override
-    protected View newView(Context context, int position, ViewGroup parentView) {
-        ViewHolder holderView = new ViewHolder();
-        View convertView = inflater.inflate(R.layout.item_meetting, null, false);
-        holderView.day = convertView.findViewById(R.id.meeting_data_day);
-        holderView.hour = convertView.findViewById(R.id.meeting_data_hour);
-        holderView.title =  convertView.findViewById(R.id.meeting_title);
-        holderView.order = convertView.findViewById(R.id.meeting_order);
-        convertView.setTag(holderView);
-        return convertView;
+    public int getCount() {
+        // TODO Auto-generated method stub
+        return data.size();
     }
 
     @Override
-    protected void bindView(Context context, View view, int position, MqttMeetingListBean model) {
-        ViewHolder holderView = (ViewHolder) view.getTag();
-        holderView.day.setText(DateTimeUtil.getInstance().transTimeToMMDD(model.getStartDate()));
-
-        holderView.hour.setText(DateTimeUtil.getInstance().transTimeToHHMM(model.getStartDate())+"-"+DateTimeUtil.getInstance().transTimeToHHMM(model.getEndDate()));
-        if ("1".equals(model.getIsOpen())){
-            holderView.title.setText(model.getName());
-        } else
-        if("0".equals(model.getIsOpen())){
-            holderView.title.setText("未公开");
-        }else{
-            holderView.title.setText(model.getName());
-        }
-        holderView.order.setText(model.getBookPerson());
+    public MqttMeetingListBean getItem(int position) {
+        // TODO Auto-generated method stub
+        return data.get(position);
     }
 
     @Override
     public long getItemId(int position) {
+        // TODO Auto-generated method stub
         return position;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        ViewHolder holderView;
+        if (convertView == null) {
+            convertView=inflater.inflate(R.layout.item_meetting, null);
+            holderView=new ViewHolder();
+            holderView.day = convertView.findViewById(R.id.meeting_data_day);
+            holderView.hour = convertView.findViewById(R.id.meeting_data_hour);
+            holderView.title =  convertView.findViewById(R.id.meeting_title);
+            holderView.order = convertView.findViewById(R.id.meeting_order);
+            convertView.setTag(holderView);
+        }else{
+            holderView=(ViewHolder) convertView.getTag();
+        }
+        MqttMeetingListBean item = data.get(position);
+
+        holderView.day.setText(DateTimeUtil.getInstance().transTimeToMMDD(item.getStartDate()));
+
+        holderView.hour.setText(DateTimeUtil.getInstance().transTimeToHHMM(item.getStartDate())+"-"+DateTimeUtil.getInstance().transTimeToHHMM(item.getEndDate()));
+        if ("1".equals(item.getIsOpen())){
+            holderView.title.setText(item.getName());
+        } else
+        if("0".equals(item.getIsOpen())){
+            holderView.title.setText("未公开");
+        }else{
+            holderView.title.setText(item.getName());
+        }
+        holderView.order.setText(item.getBookPerson());
+        return convertView;
     }
 
     class ViewHolder {

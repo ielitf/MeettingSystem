@@ -4,33 +4,45 @@ import java.util.Arrays;
 import java.util.List;
 
 public class WeatherBean {
-    private String day;
-    private String date;
+
+    private String weaid;
+    private String days;
     private String week;
-    private String wea;
-    private String wea_img;
-    private String tem1;
-    private String tem2;
-    private String tem;
-    private String win[];
-    private String win_speed;
-    private List <Hours> hours;
-    private List<Indexv> index;
+    private String cityno;
+    private String citynm;
+    private String cityid;
+    private String temperature;
+    private String humidity;
+    private String weather;
+    private String weather_icon;
+    private String weather_icon1;
+    private String wind;
+    private String winp;
+    private String temp_high;
+    private String temp_low;
+    private String humi_high;
+    private String humi_low;
+    private String weatid;
+    private String weatid1;
+    private String windid;
+    private String winpid;
+    private String weather_iconid;
+    private String weather_iconid1;
 
-    public String getDay() {
-        return day;
+    public String getWeaid() {
+        return weaid;
     }
 
-    public void setDay(String day) {
-        this.day = day;
+    public void setWeaid(String weaid) {
+        this.weaid = weaid;
     }
 
-    public String getDate() {
-        return date;
+    public String getDays() {
+        return days;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setDays(String days) {
+        this.days = days;
     }
 
     public String getWeek() {
@@ -41,93 +53,192 @@ public class WeatherBean {
         this.week = week;
     }
 
-    public String getWea() {
-        return wea;
+    public String getCityno() {
+        return cityno;
     }
 
-    public void setWea(String wea) {
-        this.wea = wea;
+    public void setCityno(String cityno) {
+        this.cityno = cityno;
     }
 
-    public String getWea_img() {
-        return wea_img;
+    public String getCitynm() {
+        return citynm;
     }
 
-    public void setWea_img(String wea_img) {
-        this.wea_img = wea_img;
+    public void setCitynm(String citynm) {
+        this.citynm = citynm;
     }
 
-    public String getTem1() {
-        return tem1;
+    public String getCityid() {
+        return cityid;
     }
 
-    public void setTem1(String tem1) {
-        this.tem1 = tem1;
+    public void setCityid(String cityid) {
+        this.cityid = cityid;
     }
 
-    public String getTem2() {
-        return tem2;
+    public String getTemperature() {
+        return temperature;
     }
 
-    public void setTem2(String tem2) {
-        this.tem2 = tem2;
+    public void setTemperature(String temperature) {
+        this.temperature = temperature;
     }
 
-    public String getTem() {
-        return tem;
+    public String getHumidity() {
+        return humidity;
     }
 
-    public void setTem(String tem) {
-        this.tem = tem;
+    public void setHumidity(String humidity) {
+        this.humidity = humidity;
     }
 
-    public String[] getWin() {
-        return win;
+    public String getWeather() {
+        return weather;
     }
 
-    public void setWin(String[] win) {
-        this.win = win;
+    public void setWeather(String weather) {
+        this.weather = weather;
     }
 
-    public String getWin_speed() {
-        return win_speed;
+    public String getWeather_icon() {
+        return weather_icon;
     }
 
-    public void setWin_speed(String win_speed) {
-        this.win_speed = win_speed;
+    public void setWeather_icon(String weather_icon) {
+        this.weather_icon = weather_icon;
     }
 
-    public List<Hours> getHours() {
-        return hours;
+    public String getWeather_icon1() {
+        return weather_icon1;
     }
 
-    public void setHours(List<Hours> hours) {
-        this.hours = hours;
+    public void setWeather_icon1(String weather_icon1) {
+        this.weather_icon1 = weather_icon1;
     }
 
-    public List<Indexv> getIndex() {
-        return index;
+    public String getWind() {
+        return wind;
     }
 
-    public void setIndex(List<Indexv> index) {
-        this.index = index;
+    public void setWind(String wind) {
+        this.wind = wind;
+    }
+
+    public String getWinp() {
+        return winp;
+    }
+
+    public void setWinp(String winp) {
+        this.winp = winp;
+    }
+
+    public String getTemp_high() {
+        return temp_high;
+    }
+
+    public void setTemp_high(String temp_high) {
+        this.temp_high = temp_high;
+    }
+
+    public String getTemp_low() {
+        return temp_low;
+    }
+
+    public void setTemp_low(String temp_low) {
+        this.temp_low = temp_low;
+    }
+
+    public String getHumi_high() {
+        return humi_high;
+    }
+
+    public void setHumi_high(String humi_high) {
+        this.humi_high = humi_high;
+    }
+
+    public String getHumi_low() {
+        return humi_low;
+    }
+
+    public void setHumi_low(String humi_low) {
+        this.humi_low = humi_low;
+    }
+
+    public String getWeatid() {
+        return weatid;
+    }
+
+    public void setWeatid(String weatid) {
+        this.weatid = weatid;
+    }
+
+    public String getWeatid1() {
+        return weatid1;
+    }
+
+    public void setWeatid1(String weatid1) {
+        this.weatid1 = weatid1;
+    }
+
+    public String getWindid() {
+        return windid;
+    }
+
+    public void setWindid(String windid) {
+        this.windid = windid;
+    }
+
+    public String getWinpid() {
+        return winpid;
+    }
+
+    public void setWinpid(String winpid) {
+        this.winpid = winpid;
+    }
+
+    public String getWeather_iconid() {
+        return weather_iconid;
+    }
+
+    public void setWeather_iconid(String weather_iconid) {
+        this.weather_iconid = weather_iconid;
+    }
+
+    public String getWeather_iconid1() {
+        return weather_iconid1;
+    }
+
+    public void setWeather_iconid1(String weather_iconid1) {
+        this.weather_iconid1 = weather_iconid1;
     }
 
     @Override
     public String toString() {
         return "WeatherBean{" +
-                "day='" + day + '\'' +
-                ", date='" + date + '\'' +
+                "weaid='" + weaid + '\'' +
+                ", days='" + days + '\'' +
                 ", week='" + week + '\'' +
-                ", wea='" + wea + '\'' +
-                ", wea_img='" + wea_img + '\'' +
-                ", tem1='" + tem1 + '\'' +
-                ", tem2='" + tem2 + '\'' +
-                ", tem='" + tem + '\'' +
-                ", win=" + Arrays.toString(win) +
-                ", win_speed='" + win_speed + '\'' +
-                ", hours=" + hours +
-                ", index=" + index +
+                ", cityno='" + cityno + '\'' +
+                ", citynm='" + citynm + '\'' +
+                ", cityid='" + cityid + '\'' +
+                ", temperature='" + temperature + '\'' +
+                ", humidity='" + humidity + '\'' +
+                ", weather='" + weather + '\'' +
+                ", weather_icon='" + weather_icon + '\'' +
+                ", weather_icon1='" + weather_icon1 + '\'' +
+                ", wind='" + wind + '\'' +
+                ", winp='" + winp + '\'' +
+                ", temp_high='" + temp_high + '\'' +
+                ", temp_low='" + temp_low + '\'' +
+                ", humi_high='" + humi_high + '\'' +
+                ", humi_low='" + humi_low + '\'' +
+                ", weatid='" + weatid + '\'' +
+                ", weatid1='" + weatid1 + '\'' +
+                ", windid='" + windid + '\'' +
+                ", winpid='" + winpid + '\'' +
+                ", weather_iconid='" + weather_iconid + '\'' +
+                ", weather_iconid1='" + weather_iconid1 + '\'' +
                 '}';
     }
 }

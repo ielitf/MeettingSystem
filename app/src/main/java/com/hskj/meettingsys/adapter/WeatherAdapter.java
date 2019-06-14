@@ -7,9 +7,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.hskj.meettingsys.R;
 import com.hskj.meettingsys.bean.JiaWeatherBean;
 import com.hskj.meettingsys.bean.WeatherBean;
+import com.hskj.meettingsys.utils.GlideHelper;
 
 import java.util.List;
 
@@ -68,14 +70,15 @@ public class WeatherAdapter extends MyBaseAdapter2<WeatherBean> {
             default:
                 break;
         }
-        holderView.tem_h.setText(item.getTem1());
-        holderView.tem_l.setText(item.getTem2());
-        holderView.wea.setText(item.getWea());
+        holderView.tem_h.setText(item.getWeather());
+        holderView.tem_l.setText(item.getTemperature());
+
+//        GlideHelper.showImageWithFullUrl(context,item.getWeather_icon(),holderView.wea);
         return convertView;
     }
 
     class ViewHolder {
         private TextView day, tem_h, tem_l;
-        private TextView wea;
+        private ImageView wea;
     }
 }

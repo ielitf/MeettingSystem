@@ -11,8 +11,8 @@
     <dimen name="a_meeting_list2">18sp</dimen>
 
     <dimen name="meeting_list_tap">18sp</dimen>
-    <dimen name="meeting_list_item_text">18sp</dimen>
-    <dimen name="weather_list_item_text">15sp</dimen>
+    <dimen name="meeting_list_item_text">16sp</dimen>
+    <dimen name="weather_list_item_text">14sp</dimen>
     <dimen name="weather_list_divide">16dp</dimen>
 
 

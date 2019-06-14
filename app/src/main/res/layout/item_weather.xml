@@ -13,22 +13,18 @@
     android:textSize="@dimen/weather_list_item_text"
     android:textColor="@color/white"
     />
-    <com.hskj.meettingsys.utils.MarqueeTextView
+    <ImageView
         android:id="@+id/weather_wea"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/weather_list_divide"
-        android:text="晴天"
-        android:singleLine="true"
-        android:ellipsize="marquee"
-        android:textSize="@dimen/weather_list_item_text"
-        android:textColor="@color/white"
         />
-    <TextView
+    <com.hskj.meettingsys.utils.MarqueeTextView
         android:id="@+id/weather_tem_h"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="16℃"
+        android:text=""
+        android:singleLine="true"
+        android:ellipsize="marquee"
         android:textSize="@dimen/weather_list_item_text"
         android:textColor="@color/white"
         />
@@ -37,7 +33,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/weather_list_divide"
-        android:text="5℃"
+        android:text=""
         android:textSize="@dimen/weather_list_item_text"
         android:textColor="@color/white"
         />

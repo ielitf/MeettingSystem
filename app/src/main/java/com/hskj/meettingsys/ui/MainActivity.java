@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
     private ViewPager viewPager;
     private  MyViewPagerAdapter pagerAdapter;
     private FragmentManager manager;
-    private TextView room,cur,today;
+    private TextView room,cur,today,news_cur,news_today;
     private EditText editText;
     private int kk;
     private boolean aBoolean = true;
@@ -94,6 +94,11 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
         editText = findViewById(R.id.edit_query);
         editText.setText(SDCardUtils.readTxt());
         viewPager = findViewById(R.id.viewPager);
+
+        news_cur=findViewById(R.id.cur_news);
+        news_today=findViewById(R.id.today_news);
+        news_cur.setOnClickListener(this);
+        news_today.setOnClickListener(this);
     }
 
     @Override
@@ -105,7 +110,8 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
             //todo   当前会议
             if (!"[]".equals(strMessage) && strMessage !=null && !TextUtils.isEmpty(strMessage)) {
                 templateId = SharePreferenceManager.getMeetingMuBanType();//读取存储的模板类型
-                curMeeting = JSON.parseArray(strMessage, MqttMeetingCurrentBean.class);
+                curMeeting.clear();
+                curMeeting.addAll(JSON.parseArray(strMessage, MqttMeetingCurrentBean.class));
                 if (templateId == 2) {//模板类型B
                     viewPager.setCurrentItem(1);
                 } else {
@@ -119,7 +125,8 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
         if (MqttService.TOPIC_MEETING_LIST.equals(topic)) {
             //todo   会议列表
             if (!"[]".equals(strMessage) && strMessage!=null&& !TextUtils.isEmpty(strMessage)) {
-                meetingList = JSON.parseArray(strMessage, MqttMeetingListBean.class);
+                meetingList.clear();
+                meetingList.addAll(JSON.parseArray(strMessage, MqttMeetingListBean.class));
                 templateId = meetingList.get(0).getTemplateId();
                 SharePreferenceManager.setMeetingMuBanType(templateId);//将模板类型存到本地缓存中
 
@@ -156,6 +163,10 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.cur_news:
+                break;
+            case R.id.today_news:
+                break;
             case R.id.room:
                 Toast.makeText(this,"会议室编号切换为："+editText.getText(),Toast.LENGTH_SHORT).show();
                 SDCardUtils.writeTxt(editText.getText()+"");

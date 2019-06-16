@@ -215,7 +215,8 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
     public void TransDataB(String topic, List mList) {
         LogUtil.w("========BFragment", "topic:" + topic + ";----mList:" + mList.toString());
         if (topic.equals(MqttService.TOPIC_MEETING_CUR)) {//当前会议
-            myCurMeetingList = mList;
+            myCurMeetingList.clear();
+            myCurMeetingList.addAll(mList);
             if (myCurMeetingList.size() > 0) {
                 Message msg = new Message();
                 msg.what = 1;
@@ -223,7 +224,8 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
             }
         }
         if (topic.equals(MqttService.TOPIC_MEETING_LIST)) {//今日会议
-            myMeetingList = mList;
+            myMeetingList.clear();
+            myMeetingList.addAll(mList);
             if (myMeetingList.size() > 0) {
                 Message msg = new Message();
                 msg.what = 2;

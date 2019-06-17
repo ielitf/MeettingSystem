@@ -28,6 +28,7 @@ import com.hskj.meettingsys.bean.WeatherBean;
 import com.hskj.meettingsys.bean.WeatherData;
 import com.hskj.meettingsys.listener.FragmentCallBackA;
 import com.hskj.meettingsys.listener.FragmentCallBackB;
+import com.hskj.meettingsys.listener.FragmentCallBackBCur;
 import com.hskj.meettingsys.listener.OnGetCurrentDateTimeListener;
 import com.hskj.meettingsys.utils.DateTimeUtil;
 import com.hskj.meettingsys.utils.IPAddressUtils;
@@ -49,7 +50,7 @@ import java.util.TimerTask;
 import okhttp3.Call;
 import okhttp3.Response;
 
-public class BFragment extends Fragment implements OnGetCurrentDateTimeListener, FragmentCallBackB {
+public class BFragment extends Fragment implements OnGetCurrentDateTimeListener, FragmentCallBackB , FragmentCallBackBCur {
     private GridView gridView;
     private WeatherAdapter weatherAdapter;
     private Context context;
@@ -69,30 +70,45 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
     private Timer timer;
     private MyWeatherTask task;
     private String ip;
+    private String JsonStringCurMeet;
     private Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
                 case 1:
-                    if (myCurMeetingList.size() > 0) {
-                        //设置当前会议数据
-                        roomName.setText(myCurMeetingList.get(0).getRoomName());
-                        String startTime = DateTimeUtil.getInstance().transTimeToHHMM(myCurMeetingList.get(0).getStartDate());
-                        String endTime = DateTimeUtil.getInstance().transTimeToHHMM(myCurMeetingList.get(0).getEndDate());
+//                    if (myCurMeetingList.size() > 0) {
+//                        //设置当前会议数据
+//                        roomName.setText(myCurMeetingList.get(0).getRoomName());
+//                        String startTime = DateTimeUtil.getInstance().transTimeToHHMM(myCurMeetingList.get(0).getStartDate());
+//                        String endTime = DateTimeUtil.getInstance().transTimeToHHMM(myCurMeetingList.get(0).getEndDate());
+//                        meetingTime.setText(startTime + "-" + endTime);
+//                        if (myCurMeetingList.get(0).getIsOpen().equals("1")) {
+//                            meetingName.setText(myCurMeetingList.get(0).getMeetingName());
+//                            meeting_bumen.setText("");
+//                        } else {
+//                            meetingName.setText("未公开");
+//                            meeting_bumen.setText("");
+//                        }
+//                    } else {
+//                        roomName.setText("会议室");
+//                        meetingName.setText("当前无会议");
+//                        meetingTime.setText("");
+//                        meeting_bumen.setText("");
+//                    }
+                    try {
+                        JSONObject jsonObject = new JSONObject(JsonStringCurMeet);
+                        roomName.setText(jsonObject.getString("roomName"));
+                        String startTime = DateTimeUtil.getInstance().transTimeToHHMM(jsonObject.getLong("startDate"));
+                        String endTime = DateTimeUtil.getInstance().transTimeToHHMM(jsonObject.getLong("endDate"));
                         meetingTime.setText(startTime + "-" + endTime);
-                        if (myCurMeetingList.get(0).getIsOpen().equals("1")) {
-                            meetingName.setText(myCurMeetingList.get(0).getMeetingName());
-                            meeting_bumen.setText("");
-                        } else {
+                        if(jsonObject.getString("isOpen").equals("1")){
+                            meetingName.setText(jsonObject.getString("roomName"));
+                        }else{
                             meetingName.setText("未公开");
-                            meeting_bumen.setText("");
                         }
-                    } else {
-                        roomName.setText("会议室");
-                        meetingName.setText("当前无会议");
-                        meetingTime.setText("");
-                        meeting_bumen.setText("");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
                     break;
                 case 2:
@@ -150,7 +166,7 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
         timeThread.start();
         loadWeatherData();
         MainActivity.setFragmentCallBackB(this);
-
+        MainActivity.setFragmentCallBackBCur(this);
         listScrollUp();
         meeting_listView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
@@ -211,6 +227,16 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
         jiaAdapter = new MeetingAdapterA(context,jiaMeetingList);
         meeting_listView.setAdapter(jiaAdapter);
     }
+
+    @Override
+    public void TransDataBCur(String topic, String jsonStr) {
+        LogUtil.w("========BFragment", "topic:" + topic + ";----jsonStr:" + jsonStr);
+        JsonStringCurMeet = jsonStr;
+        Message msg = new Message();
+        msg.what = 1;
+        handler.sendMessage(msg);
+    }
+
     @Override
     public void TransDataB(String topic, List mList) {
         LogUtil.w("========BFragment", "topic:" + topic + ";----mList:" + mList.toString());
@@ -258,6 +284,7 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
         timeTv.setText(dateTimeUtil.getCurrentTime());//显示时间
         dataTv.setText(dateTimeUtil.getCurrentDateYYMMDD() + "\t" + dateTimeUtil.getCurrentWeekDay(0));//显示年月日
     }
+
     /**
      * 定时更新天气，暂定1小时更新一次
      */

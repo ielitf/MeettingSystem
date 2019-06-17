@@ -77,40 +77,40 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
             super.handleMessage(msg);
             switch (msg.what) {
                 case 1:
-//                    if (myCurMeetingList.size() > 0) {
-//                        //设置当前会议数据
-//                        roomName.setText(myCurMeetingList.get(0).getRoomName());
-//                        String startTime = DateTimeUtil.getInstance().transTimeToHHMM(myCurMeetingList.get(0).getStartDate());
-//                        String endTime = DateTimeUtil.getInstance().transTimeToHHMM(myCurMeetingList.get(0).getEndDate());
-//                        meetingTime.setText(startTime + "-" + endTime);
-//                        if (myCurMeetingList.get(0).getIsOpen().equals("1")) {
-//                            meetingName.setText(myCurMeetingList.get(0).getMeetingName());
-//                            meeting_bumen.setText("");
-//                        } else {
-//                            meetingName.setText("未公开");
-//                            meeting_bumen.setText("");
-//                        }
-//                    } else {
-//                        roomName.setText("会议室");
-//                        meetingName.setText("当前无会议");
-//                        meetingTime.setText("");
-//                        meeting_bumen.setText("");
-//                    }
-                    try {
-                        LogUtil.w("========BFragment",  ";----JsonStringCurMeet:" + JsonStringCurMeet);
-                        JSONObject jsonObject = new JSONObject(JsonStringCurMeet);
-                        roomName.setText(jsonObject.getString("roomName"));
-                        String startTime = DateTimeUtil.getInstance().transTimeToHHMM(jsonObject.getLong("startDate"));
-                        String endTime = DateTimeUtil.getInstance().transTimeToHHMM(jsonObject.getLong("endDate"));
+                    if (myCurMeetingList.size() > 0) {
+                        //设置当前会议数据
+                        roomName.setText(myCurMeetingList.get(0).getRoomName());
+                        String startTime = DateTimeUtil.getInstance().transTimeToHHMM(myCurMeetingList.get(0).getStartDate());
+                        String endTime = DateTimeUtil.getInstance().transTimeToHHMM(myCurMeetingList.get(0).getEndDate());
                         meetingTime.setText(startTime + "-" + endTime);
-                        if (jsonObject.getString("isOpen").equals("1")) {
-                            meetingName.setText(jsonObject.getString("meetingName"));
+                        if (myCurMeetingList.get(0).getIsOpen().equals("1")) {
+                            meetingName.setText(myCurMeetingList.get(0).getMeetingName());
+                            meeting_bumen.setText("");
                         } else {
                             meetingName.setText("未公开");
+                            meeting_bumen.setText("");
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                    } else {
+                        roomName.setText("会议室");
+                        meetingName.setText("当前无会议");
+                        meetingTime.setText("");
+                        meeting_bumen.setText("");
                     }
+//                    try {
+//                        LogUtil.w("========BFragment",  ";----JsonStringCurMeet:" + JsonStringCurMeet);
+//                        JSONObject jsonObject = new JSONObject(JsonStringCurMeet);
+//                        roomName.setText(jsonObject.getString("roomName"));
+//                        String startTime = DateTimeUtil.getInstance().transTimeToHHMM(jsonObject.getLong("startDate"));
+//                        String endTime = DateTimeUtil.getInstance().transTimeToHHMM(jsonObject.getLong("endDate"));
+//                        meetingTime.setText(startTime + "-" + endTime);
+//                        if (jsonObject.getString("isOpen").equals("1")) {
+//                            meetingName.setText(jsonObject.getString("meetingName"));
+//                        } else {
+//                            meetingName.setText("未公开");
+//                        }
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
                     break;
                 case 2:
                     if (myMeetingList.size() > 0) {
@@ -244,15 +244,15 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
     @Override
     public void TransDataB(String topic, List mList) {
         LogUtil.w("========BFragment", "topic:" + topic + ";----mList:" + mList.toString());
-//        if (topic.equals(MqttService.TOPIC_MEETING_CUR)) {//当前会议
-//            myCurMeetingList.clear();
-//            myCurMeetingList.addAll(mList);
-//            if (myCurMeetingList.size() > 0) {
-//                Message msg = new Message();
-//                msg.what = 1;
-//                handler.sendMessage(msg);
-//            }
-//        }
+        if (topic.equals(MqttService.TOPIC_MEETING_CUR)) {//当前会议
+            myCurMeetingList.clear();
+            myCurMeetingList.addAll(mList);
+            if (myCurMeetingList.size() > 0) {
+                Message msg = new Message();
+                msg.what = 1;
+                handler.sendMessage(msg);
+            }
+        }
         if (topic.equals(MqttService.TOPIC_MEETING_LIST)) {//今日会议
             myMeetingList.clear();
             myMeetingList.addAll(mList);

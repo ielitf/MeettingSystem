@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
     private MqttService mqttService = new MqttService();
     private boolean isFirst = true;
     private List<MqttMeetingListBean> meetingList = new ArrayList<>();
-    //    private List<MqttMeetingCurrentBean> curMeeting = new ArrayList<>();
+    private List<MqttMeetingCurrentBean> curMeeting = new ArrayList<>();
     private MeetingAdapter adapter = null;
     private String JsonStringCurMeet;
     @Override
@@ -117,16 +117,18 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
             //todo   当前会议
             if (!"".equals(strMessage) && !"[]".equals(strMessage) && strMessage != null && !TextUtils.isEmpty(strMessage)) {
                 templateId = SharePreferenceManager.getMeetingMuBanType();//读取存储的模板类型
-//                curMeeting.clear();
-//                curMeeting.addAll(JSON.parseArray(strMessage, MqttMeetingCurrentBean.class));
-                JsonStringCurMeet = strMessage;
+                curMeeting.clear();
+                curMeeting.addAll(JSON.parseArray(strMessage, MqttMeetingCurrentBean.class));
+//                JsonStringCurMeet = strMessage;
                 if (templateId == 2) {//模板类型B
                     viewPager.setCurrentItem(1);
                 } else {
                     viewPager.setCurrentItem(0);
                 }
-                fragmentCallBackACur.TransDataACur(topic, JsonStringCurMeet);
-                fragmentCallBackBCur.TransDataBCur(topic, JsonStringCurMeet);
+//                fragmentCallBackACur.TransDataACur(topic, JsonStringCurMeet);
+//                fragmentCallBackBCur.TransDataBCur(topic, JsonStringCurMeet);
+                fragmentCallBackA.TransDataA(topic, curMeeting);
+                fragmentCallBackB.TransDataB(topic, curMeeting);
             }
         }
 
@@ -172,35 +174,35 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.cur_news:
-                if(ceshi){
-                    strMessage = "{\"endDate\":1560760200000,\"isOpen\":\"1\",\"meetingId\":576,\"meetingName\":\"zhanghao\",\"roomName\":\"慧视科技会议室1\",\"startDate\":1560735900000}";
-                    fragmentCallBackACur.TransDataACur(topic, strMessage);
-                    fragmentCallBackBCur.TransDataBCur(topic, strMessage);
-                    ceshi = false;
-                }else{
-                    strMessage = "{\"endDate\":1560760200000,\"isOpen\":\"1\",\"meetingId\":576,\"meetingName\":\"zhanghao\",\"roomName\":\"慧视科技会议室2\",\"startDate\":1560735900000}";
-                    fragmentCallBackACur.TransDataACur(topic, strMessage);
-                    fragmentCallBackBCur.TransDataBCur(topic, strMessage);
-                    ceshi = true;
-                }
+//                if(ceshi){
+//                    strMessage = "{\"endDate\":1560760200000,\"isOpen\":\"1\",\"meetingId\":576,\"meetingName\":\"zhanghao11\",\"roomName\":\"慧视科技会议室1\",\"startDate\":1560735900000}";
+//                    fragmentCallBackACur.TransDataACur(topic, strMessage);
+//                    fragmentCallBackBCur.TransDataBCur(topic, strMessage);
+//                    ceshi = false;
+//                }else{
+//                    strMessage = "{\"endDate\":1560760200000,\"isOpen\":\"1\",\"meetingId\":576,\"meetingName\":\"zhanghao22\",\"roomName\":\"慧视科技会议室2\",\"startDate\":1560735900000}";
+//                    fragmentCallBackACur.TransDataACur(topic, strMessage);
+//                    fragmentCallBackBCur.TransDataBCur(topic, strMessage);
+//                    ceshi = true;
+//                }
                 break;
             case R.id.today_news:
 
-                if(ceshi){
-                    meetingList.clear();
-                    strMessage = "[{\"bookPerson\":\"zhanghao11\",\"endDate\":1560743100000,\"id\":581,\"isOpen\":\"1\",\"name\":\"kkkk11\",\"roomName\":\"慧视科技会议室\",\"startDate\":1560742200000,\"templateId\":2},{\"bookPerson\":\"zhangsan11\",\"endDate\":1560744900000,\"id\":583,\"isOpen\":\"1\",\"name\":\"1231111\",\"roomName\":\"慧视科技会议室\",\"startDate\":1560744000000,\"templateId\":2}]";
-                    meetingList.addAll(JSON.parseArray(strMessage, MqttMeetingListBean.class));
-                    fragmentCallBackA.TransDataA("001_meetList", meetingList);
-                    fragmentCallBackB.TransDataB("001_meetList", meetingList);
-                    ceshi = false;
-                }else{
-                    meetingList.clear();
-                    strMessage = "[{\"bookPerson\":\"zhanghao22\",\"endDate\":1560743100000,\"id\":581,\"isOpen\":\"1\",\"name\":\"kkkk22\",\"roomName\":\"慧视科技会议室\",\"startDate\":1560742200000,\"templateId\":2},{\"bookPerson\":\"zhangsan22\",\"endDate\":1560744900000,\"id\":583,\"isOpen\":\"1\",\"name\":\"1232222\",\"roomName\":\"慧视科技会议室\",\"startDate\":1560744000000,\"templateId\":2}]";
-                    meetingList.addAll(JSON.parseArray(strMessage, MqttMeetingListBean.class));
-                    fragmentCallBackA.TransDataA("001_meetList", meetingList);
-                    fragmentCallBackB.TransDataB("001_meetList", meetingList);
-                    ceshi = true;
-                }
+//                if(ceshi){
+//                    meetingList.clear();
+//                    strMessage = "[{\"bookPerson\":\"zhanghao11\",\"endDate\":1560743100000,\"id\":581,\"isOpen\":\"1\",\"name\":\"kkkk11\",\"roomName\":\"慧视科技会议室\",\"startDate\":1560742200000,\"templateId\":2},{\"bookPerson\":\"zhangsan11\",\"endDate\":1560744900000,\"id\":583,\"isOpen\":\"1\",\"name\":\"1231111\",\"roomName\":\"慧视科技会议室\",\"startDate\":1560744000000,\"templateId\":2}]";
+//                    meetingList.addAll(JSON.parseArray(strMessage, MqttMeetingListBean.class));
+//                    fragmentCallBackA.TransDataA("001_meetList", meetingList);
+//                    fragmentCallBackB.TransDataB("001_meetList", meetingList);
+//                    ceshi = false;
+//                }else{
+//                    meetingList.clear();
+//                    strMessage = "[{\"bookPerson\":\"zhanghao22\",\"endDate\":1560743100000,\"id\":581,\"isOpen\":\"1\",\"name\":\"kkkk22\",\"roomName\":\"慧视科技会议室\",\"startDate\":1560742200000,\"templateId\":2},{\"bookPerson\":\"zhangsan22\",\"endDate\":1560744900000,\"id\":583,\"isOpen\":\"1\",\"name\":\"1232222\",\"roomName\":\"慧视科技会议室\",\"startDate\":1560744000000,\"templateId\":2}]";
+//                    meetingList.addAll(JSON.parseArray(strMessage, MqttMeetingListBean.class));
+//                    fragmentCallBackA.TransDataA("001_meetList", meetingList);
+//                    fragmentCallBackB.TransDataB("001_meetList", meetingList);
+//                    ceshi = true;
+//                }
                 break;
             case R.id.room:
                 Toast.makeText(this, "会议室编号切换为：" + editText.getText(), Toast.LENGTH_SHORT).show();

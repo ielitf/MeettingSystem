@@ -48,19 +48,18 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
     private AFragment aFragment = new AFragment();
     private BFragment bFragment = new BFragment();
     private ViewPager viewPager;
-    private  MyViewPagerAdapter pagerAdapter;
+    private MyViewPagerAdapter pagerAdapter;
     private FragmentManager manager;
-    private TextView room,cur,today,news_cur,news_today;
+    private TextView room, cur, today, news_cur, news_today;
     private EditText editText;
     private int kk;
     private boolean aBoolean = true;
-    private  String topic,strMessage;
+    private String topic, strMessage;
     private int templateId;// 0 代表模板A   1代表模板2
     private MqttService mqttService = new MqttService();
     private boolean isFirst = true;
     private List<MqttMeetingListBean> meetingList = new ArrayList<>();
-//    private List<MqttMeetingCurrentBean> curMeeting = new ArrayList<>();
-    private String strCurMeetingJson;
+    //    private List<MqttMeetingCurrentBean> curMeeting = new ArrayList<>();
     private MeetingAdapter adapter = null;
 
     @Override
@@ -85,9 +84,9 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
         frags.add(bFragment);
         pagerAdapter = new MyViewPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(pagerAdapter);
-        if (templateId ==1 ) {
+        if (templateId == 1) {
             viewPager.setCurrentItem(0);
-        }else {
+        } else {
             viewPager.setCurrentItem(1);
         }
     }
@@ -103,8 +102,8 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
         editText.setText(SDCardUtils.readTxt());
         viewPager = findViewById(R.id.viewPager);
 
-        news_cur=findViewById(R.id.cur_news);
-        news_today=findViewById(R.id.today_news);
+        news_cur = findViewById(R.id.cur_news);
+        news_today = findViewById(R.id.today_news);
         news_cur.setOnClickListener(this);
         news_today.setOnClickListener(this);
     }
@@ -116,24 +115,23 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
         LogUtil.w("===Main", "topic:" + topic + ";----strMessage:" + strMessage);
         if (MqttService.TOPIC_MEETING_CUR.equals(topic)) {
             //todo   当前会议
-            if (!"".equals(strMessage) && !"[]".equals(strMessage) && strMessage !=null && !TextUtils.isEmpty(strMessage)) {
+            if (!"".equals(strMessage) && !"[]".equals(strMessage) && strMessage != null && !TextUtils.isEmpty(strMessage)) {
                 templateId = SharePreferenceManager.getMeetingMuBanType();//读取存储的模板类型
 //                curMeeting.clear();
 //                curMeeting.addAll(JSON.parseArray(strMessage, MqttMeetingCurrentBean.class));
-                strCurMeetingJson = strMessage;
                 if (templateId == 2) {//模板类型B
                     viewPager.setCurrentItem(1);
                 } else {
                     viewPager.setCurrentItem(0);
                 }
-                fragmentCallBackACur.TransDataACur(topic,strCurMeetingJson);
-                fragmentCallBackBCur.TransDataBCur(topic,strCurMeetingJson);
+                fragmentCallBackACur.TransDataACur(topic, strMessage);
+                fragmentCallBackBCur.TransDataBCur(topic, strMessage);
             }
         }
 
         if (MqttService.TOPIC_MEETING_LIST.equals(topic)) {
             //todo   会议列表
-            if (!"[]".equals(strMessage) && strMessage!=null&& !TextUtils.isEmpty(strMessage)) {
+            if (!"".equals(strMessage) &&!"[]".equals(strMessage) && strMessage != null && !TextUtils.isEmpty(strMessage)) {
                 meetingList.clear();
                 meetingList.addAll(JSON.parseArray(strMessage, MqttMeetingListBean.class));
                 templateId = meetingList.get(0).getTemplateId();
@@ -144,8 +142,8 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
                 } else {//模板a
                     viewPager.setCurrentItem(0);
                 }
-                fragmentCallBackA.TransDataA(topic,meetingList);
-                fragmentCallBackB.TransDataB(topic,meetingList);
+                fragmentCallBackA.TransDataA(topic, meetingList);
+                fragmentCallBackB.TransDataB(topic, meetingList);
             }
         }
     }
@@ -177,10 +175,11 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
             case R.id.today_news:
                 break;
             case R.id.room:
-                Toast.makeText(this,"会议室编号切换为："+editText.getText(),Toast.LENGTH_SHORT).show();
-                SDCardUtils.writeTxt(editText.getText()+"");
-                MqttService.TOPIC_MEETING_LIST = editText.getText()+ "_meetList";
-                MqttService.TOPIC_MEETING_CUR = editText.getText()+ "_currtMeet";;
+                Toast.makeText(this, "会议室编号切换为：" + editText.getText(), Toast.LENGTH_SHORT).show();
+                SDCardUtils.writeTxt(editText.getText() + "");
+                MqttService.TOPIC_MEETING_LIST = editText.getText() + "_meetList";
+                MqttService.TOPIC_MEETING_CUR = editText.getText() + "_currtMeet";
+                ;
                 break;
             case R.id.cur:
 //                mqttService.publish(MqttService.TOPIC_MEETING_CUR,CodeConstants.MEETING_CUR_DATA,0);
@@ -190,20 +189,24 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
                 break;
         }
     }
-    public static void setFragmentCallBackA(FragmentCallBackA callBack){
+
+    public static void setFragmentCallBackA(FragmentCallBackA callBack) {
         fragmentCallBackA = callBack;
     }
-    public static void setFragmentCallBackB(FragmentCallBackB callBack){
+
+    public static void setFragmentCallBackB(FragmentCallBackB callBack) {
         fragmentCallBackB = callBack;
     }
-    public static void setFragmentCallBackACur(FragmentCallBackACur callBack){
+
+    public static void setFragmentCallBackACur(FragmentCallBackACur callBack) {
         fragmentCallBackACur = callBack;
     }
-    public static void setFragmentCallBackBCur(FragmentCallBackBCur callBack){
+
+    public static void setFragmentCallBackBCur(FragmentCallBackBCur callBack) {
         fragmentCallBackBCur = callBack;
     }
 
-    private  class MyViewPagerAdapter extends FragmentPagerAdapter {
+    private class MyViewPagerAdapter extends FragmentPagerAdapter {
         public MyViewPagerAdapter(FragmentManager fm) {
             super(fm);
         }
@@ -215,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
 
         @Override
         public int getCount() {
-            return frags == null ? 0:frags.size();
+            return frags == null ? 0 : frags.size();
         }
     }
 }

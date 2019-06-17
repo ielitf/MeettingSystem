@@ -48,7 +48,7 @@ import java.util.TimerTask;
 import okhttp3.Call;
 import okhttp3.Response;
 
-public class AFragment extends Fragment implements OnGetCurrentDateTimeListener, FragmentCallBackA , FragmentCallBackACur {
+public class AFragment extends Fragment implements OnGetCurrentDateTimeListener, FragmentCallBackA, FragmentCallBackACur {
     private GridView gridView;
     private WeatherAdapter weatherAdapter;
     private Context context;
@@ -60,11 +60,11 @@ public class AFragment extends Fragment implements OnGetCurrentDateTimeListener,
     private List<MqttMeetingCurrentBean> myCurMeetingList = new ArrayList<>();
     private MeetingAdapter adapter = null;
     private MeetingAdapterA jiaAdapter = null;
-    private TextView timeTv, dataTv, roomName, meetingName, meetingTime, meeting_bumen,room_num;
+    private TextView timeTv, dataTv, roomName, meetingName, meetingTime, meeting_bumen, room_num;
     private DateTimeUtil dateTimeUtil;
     private TimeThread timeThread;
     private long delayTime = 3000;//listView列表比较多时，自动滚动的时间间隔
-    private long weathetUpdataTime = 3600*1000;//天气定时更新
+    private long weathetUpdataTime = 3600 * 1000;//天气定时更新
     private Timer timer;
     private MyWeatherTask task;
     private String ip;
@@ -100,9 +100,9 @@ public class AFragment extends Fragment implements OnGetCurrentDateTimeListener,
                         String startTime = DateTimeUtil.getInstance().transTimeToHHMM(jsonObject.getLong("startDate"));
                         String endTime = DateTimeUtil.getInstance().transTimeToHHMM(jsonObject.getLong("endDate"));
                         meetingTime.setText(startTime + "-" + endTime);
-                        if(jsonObject.getString("isOpen").equals("1")){
+                        if (jsonObject.getString("isOpen").equals("1")) {
                             meetingName.setText(jsonObject.getString("roomName"));
-                        }else{
+                        } else {
                             meetingName.setText("未公开");
                         }
                     } catch (JSONException e) {
@@ -197,12 +197,12 @@ public class AFragment extends Fragment implements OnGetCurrentDateTimeListener,
                 .params("app", "weather.future")
                 .params("weaid", ip)
                 .params("appkey", K780Utils.APPKEY)
-                .params("sign",K780Utils.SIGN)
-                .params("format","json")
+                .params("sign", K780Utils.SIGN)
+                .params("format", "json")
                 .execute(new StringCallback() {
                     @Override
                     public void onSuccess(String s, Call call, Response response) {
-                        LogUtil.w("=========天气",s);
+                        LogUtil.w("=========天气", s);
                         if (response.code() == 200) {
                             try {
                                 JSONObject jsonObject = new JSONObject(s);
@@ -229,15 +229,17 @@ public class AFragment extends Fragment implements OnGetCurrentDateTimeListener,
         jiaAdapter = new MeetingAdapterA(context, jiaMeetingList);
         meeting_listView.setAdapter(jiaAdapter);
     }
+
     @Override
     public void TransDataACur(String topic, String jsonStr) {
         LogUtil.w("========AFragment", "topic:" + topic + ";----jsonStr:" + jsonStr);
         JsonStringCurMeet = jsonStr;
         Message msg = new Message();
-                    msg.what = 1;
-                    handler.sendMessage(msg);
+        msg.what = 1;
+        handler.sendMessage(msg);
 
     }
+
     @Override
     public void TransDataA(String topic, List mList) {
         LogUtil.w("========AFragment", "topic:" + topic + ";----mList:" + mList.toString());
@@ -253,17 +255,17 @@ public class AFragment extends Fragment implements OnGetCurrentDateTimeListener,
         if (topic.equals(MqttService.TOPIC_MEETING_LIST)) {//今日会议
             myMeetingList.clear();
             myMeetingList.addAll(mList);
-                if (myMeetingList.size() > 0) {
-                    Message msg = new Message();
-                    msg.what = 2;
-                    handler.sendMessage(msg);
-                }
+            if (myMeetingList.size() > 0) {
+                Message msg = new Message();
+                msg.what = 2;
+                handler.sendMessage(msg);
+            }
         }
     }
 
     private void initViews(View view) {
         room_num = view.findViewById(R.id.room_num);
-        room_num.setText("当前会议室编号："+SDCardUtils.readTxt()+"");
+        room_num.setText("当前会议室编号：" + SDCardUtils.readTxt() + "");
         meeting_listView = view.findViewById(R.id.meeting_list_a);
         timeTv = view.findViewById(R.id.timea);
         dataTv = view.findViewById(R.id.dataa);

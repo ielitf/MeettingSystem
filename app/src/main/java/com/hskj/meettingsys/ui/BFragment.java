@@ -50,7 +50,7 @@ import java.util.TimerTask;
 import okhttp3.Call;
 import okhttp3.Response;
 
-public class BFragment extends Fragment implements OnGetCurrentDateTimeListener, FragmentCallBackB , FragmentCallBackBCur {
+public class BFragment extends Fragment implements OnGetCurrentDateTimeListener, FragmentCallBackB, FragmentCallBackBCur {
     private GridView gridView;
     private WeatherAdapter weatherAdapter;
     private Context context;
@@ -62,16 +62,16 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
     private List<MqttMeetingListBean> myMeetingList = new ArrayList<>();
     private List<MqttMeetingCurrentBean> myCurMeetingList = new ArrayList<>();
     private MeetingAdapter adapter = null;
-    private TextView timeTv, dataTv, roomName, meetingName, meetingTime, meeting_bumen,room_num;
+    private TextView timeTv, dataTv, roomName, meetingName, meetingTime, meeting_bumen, room_num;
     private DateTimeUtil dateTimeUtil;
     private TimeThread timeThread;
     private long delayTime = 3000;//listView列表比较多时，自动滚动的时间间隔
-    private long weathetUpdataTime = 3600*1000;//天气定时更新
+    private long weathetUpdataTime = 3600 * 1000;//天气定时更新
     private Timer timer;
     private MyWeatherTask task;
     private String ip;
     private String JsonStringCurMeet;
-    private Handler handler = new Handler(){
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
@@ -102,9 +102,9 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
                         String startTime = DateTimeUtil.getInstance().transTimeToHHMM(jsonObject.getLong("startDate"));
                         String endTime = DateTimeUtil.getInstance().transTimeToHHMM(jsonObject.getLong("endDate"));
                         meetingTime.setText(startTime + "-" + endTime);
-                        if(jsonObject.getString("isOpen").equals("1")){
+                        if (jsonObject.getString("isOpen").equals("1")) {
                             meetingName.setText(jsonObject.getString("roomName"));
-                        }else{
+                        } else {
                             meetingName.setText("未公开");
                         }
                     } catch (JSONException e) {
@@ -151,6 +151,7 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
         handler.removeCallbacks(run_scroll_up);
         handler.postDelayed(run_scroll_up, delayTime);
     }
+
     public BFragment() {
 
     }
@@ -188,20 +189,21 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
 //        initWeatherData()
         return convertView;
     }
+
     private void loadWeatherData() {
         timingAgain();
         ip = IPAddressUtils.getAndroidIp(context);
-        LogUtil.i("===",ip);
+        LogUtil.i("===", ip);
         OkGo.get("http://api.k780.com:88/?")
                 .params("app", "weather.future")
                 .params("weaid", ip)
                 .params("appkey", K780Utils.APPKEY)
-                .params("sign",K780Utils.SIGN)
-                .params("format","json")
+                .params("sign", K780Utils.SIGN)
+                .params("format", "json")
                 .execute(new StringCallback() {
                     @Override
                     public void onSuccess(String s, Call call, Response response) {
-                        LogUtil.w("=========天气",s);
+                        LogUtil.w("=========天气", s);
                         if (response.code() == 200) {
                             try {
                                 JSONObject jsonObject = new JSONObject(s);
@@ -217,14 +219,15 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
                     }
                 });
     }
+
     /**
      * 添加假数据
      */
     private void initData() {
-        for(int i = 0; i< MeetingData.meeting_title.length; i++){
-            jiaMeetingList.add(new MeetingItemBean(MeetingData.meeting_data_day[i],MeetingData.meeting_data_hour[i],MeetingData.meeting_title[i],MeetingData.meeting_order[i]));
+        for (int i = 0; i < MeetingData.meeting_title.length; i++) {
+            jiaMeetingList.add(new MeetingItemBean(MeetingData.meeting_data_day[i], MeetingData.meeting_data_hour[i], MeetingData.meeting_title[i], MeetingData.meeting_order[i]));
         }
-        jiaAdapter = new MeetingAdapterA(context,jiaMeetingList);
+        jiaAdapter = new MeetingAdapterA(context, jiaMeetingList);
         meeting_listView.setAdapter(jiaAdapter);
     }
 
@@ -240,15 +243,15 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
     @Override
     public void TransDataB(String topic, List mList) {
         LogUtil.w("========BFragment", "topic:" + topic + ";----mList:" + mList.toString());
-        if (topic.equals(MqttService.TOPIC_MEETING_CUR)) {//当前会议
-            myCurMeetingList.clear();
-            myCurMeetingList.addAll(mList);
-            if (myCurMeetingList.size() > 0) {
-                Message msg = new Message();
-                msg.what = 1;
-                handler.sendMessage(msg);
-            }
-        }
+//        if (topic.equals(MqttService.TOPIC_MEETING_CUR)) {//当前会议
+//            myCurMeetingList.clear();
+//            myCurMeetingList.addAll(mList);
+//            if (myCurMeetingList.size() > 0) {
+//                Message msg = new Message();
+//                msg.what = 1;
+//                handler.sendMessage(msg);
+//            }
+//        }
         if (topic.equals(MqttService.TOPIC_MEETING_LIST)) {//今日会议
             myMeetingList.clear();
             myMeetingList.addAll(mList);
@@ -262,7 +265,7 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
 
     private void initViews(View view) {
         room_num = view.findViewById(R.id.room_num);
-        room_num.setText("当前会议室编号："+SDCardUtils.readTxt()+"");
+        room_num.setText("当前会议室编号：" + SDCardUtils.readTxt() + "");
         meeting_listView = view.findViewById(R.id.meeting_listb);
         timeTv = view.findViewById(R.id.timeb);
         dataTv = view.findViewById(R.id.datab);
@@ -272,13 +275,15 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
         meeting_bumen = view.findViewById(R.id.current_meeting_bm_b);
         gridView = view.findViewById(R.id.weather_b);
     }
+
     private void initWeatherData() {
-        for (int i = 0; i< WeatherData.weather_day.length; i++){
-            jiaWeatherList.add(new JiaWeatherBean(WeatherData.weather_day[i],WeatherData.weather_icon[i],WeatherData.weather_tem_h[i],WeatherData.weather_tem_l[i]));
+        for (int i = 0; i < WeatherData.weather_day.length; i++) {
+            jiaWeatherList.add(new JiaWeatherBean(WeatherData.weather_day[i], WeatherData.weather_icon[i], WeatherData.weather_tem_h[i], WeatherData.weather_tem_l[i]));
         }
 //        weatherAdapter = new WeatherAdapter(context,jiaWeatherList);
 //        gridView.setAdapter(weatherAdapter);
     }
+
     @Override
     public void onGetDateTime() {
         timeTv.setText(dateTimeUtil.getCurrentTime());//显示时间
@@ -317,6 +322,7 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
         LogUtil.i("===", "重新计时");
 
     }
+
     @Override
     public void onDestroy() {
         super.onDestroy();

@@ -70,7 +70,7 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
     private Timer timer;
     private MyWeatherTask task;
     private String ip;
-    private String JsonStringCurMeet;
+    private static String JsonStringCurMeet;
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -97,6 +97,7 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
 //                        meeting_bumen.setText("");
 //                    }
                     try {
+                        LogUtil.w("========BFragment",  ";----JsonStringCurMeet:" + JsonStringCurMeet);
                         JSONObject jsonObject = new JSONObject(JsonStringCurMeet);
                         roomName.setText(jsonObject.getString("roomName"));
                         String startTime = DateTimeUtil.getInstance().transTimeToHHMM(jsonObject.getLong("startDate"));

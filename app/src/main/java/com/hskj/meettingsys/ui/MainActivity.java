@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
     private List<MqttMeetingListBean> meetingList = new ArrayList<>();
     //    private List<MqttMeetingCurrentBean> curMeeting = new ArrayList<>();
     private MeetingAdapter adapter = null;
-
+    private String JsonStringCurMeet;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,13 +119,14 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
                 templateId = SharePreferenceManager.getMeetingMuBanType();//读取存储的模板类型
 //                curMeeting.clear();
 //                curMeeting.addAll(JSON.parseArray(strMessage, MqttMeetingCurrentBean.class));
+                JsonStringCurMeet = strMessage;
                 if (templateId == 2) {//模板类型B
                     viewPager.setCurrentItem(1);
                 } else {
                     viewPager.setCurrentItem(0);
                 }
-                fragmentCallBackACur.TransDataACur(topic, strMessage);
-                fragmentCallBackBCur.TransDataBCur(topic, strMessage);
+                fragmentCallBackACur.TransDataACur(topic, JsonStringCurMeet);
+                fragmentCallBackBCur.TransDataBCur(topic, JsonStringCurMeet);
             }
         }
 
@@ -173,6 +174,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
             case R.id.cur_news:
                 if(ceshi){
                     strMessage = "{\"endDate\":1560760200000,\"isOpen\":\"1\",\"meetingId\":576,\"meetingName\":\"zhanghao\",\"roomName\":\"慧视科技会议室1\",\"startDate\":1560735900000}";
+                    strMessage = "{\"endDate\":1560765600000,\"isOpen\":\"1\",\"meetingId\":586,\"meetingName\":\"zhanghao3\",\"roomName\":\"慧视科技会议室\",\"startDate\":1560751500000}";
                     fragmentCallBackACur.TransDataACur(topic, strMessage);
                     fragmentCallBackBCur.TransDataBCur(topic, strMessage);
                     ceshi = false;

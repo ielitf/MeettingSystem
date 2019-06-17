@@ -174,7 +174,6 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
             case R.id.cur_news:
                 if(ceshi){
                     strMessage = "{\"endDate\":1560760200000,\"isOpen\":\"1\",\"meetingId\":576,\"meetingName\":\"zhanghao\",\"roomName\":\"慧视科技会议室1\",\"startDate\":1560735900000}";
-                    strMessage = "{\"endDate\":1560765600000,\"isOpen\":\"1\",\"meetingId\":586,\"meetingName\":\"zhanghao3\",\"roomName\":\"慧视科技会议室\",\"startDate\":1560751500000}";
                     fragmentCallBackACur.TransDataACur(topic, strMessage);
                     fragmentCallBackBCur.TransDataBCur(topic, strMessage);
                     ceshi = false;

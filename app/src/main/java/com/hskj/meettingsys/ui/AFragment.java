@@ -102,7 +102,7 @@ public class AFragment extends Fragment implements OnGetCurrentDateTimeListener,
                         String endTime = DateTimeUtil.getInstance().transTimeToHHMM(jsonObject.getLong("endDate"));
                         meetingTime.setText(startTime + "-" + endTime);
                         if (jsonObject.getString("isOpen").equals("1")) {
-                            meetingName.setText(jsonObject.getString("roomName"));
+                            meetingName.setText(jsonObject.getString("meetingName"));
                         } else {
                             meetingName.setText("未公开");
                         }

@@ -73,7 +73,6 @@ public class WeatherAdapter extends MyBaseAdapter2<WeatherBean> {
         holderView.tem_h.setText(item.getWeather());
         holderView.tem_l.setText(item.getTemperature());
 
-//        GlideHelper.showImageWithFullUrl(context,item.getWeather_icon(),holderView.wea);
         return convertView;
     }
 

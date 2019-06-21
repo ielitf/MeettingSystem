@@ -23,7 +23,8 @@ public class MyApplication extends Application {
 		super.onCreate();
 		SharePreferenceManager.init(getApplicationContext(), SHARED_PREFERENCE_NAME);
 		if(SharePreferenceManager.getIsFirstUse()){
-			SDCardUtils.writeTxt("001");
+			SDCardUtils.writeTxt("001",CodeConstants.ROOM_NUMBER);
+			SDCardUtils.writeTxt("192.168.10.2:1883",CodeConstants.IP_HOST);
 			SharePreferenceManager.setIsFirstUse(false);
 		}
 		//全局初始化

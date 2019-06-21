@@ -47,9 +47,9 @@ public class SDCardUtils {
             return null;
         }
     }
+
     /**
      * 获取外置SD卡路径
-     *
      */
     public static String[] getExtSDCardPath(Context context) {
         StorageManager storageManager = (StorageManager) context.getSystemService(Context
@@ -60,7 +60,7 @@ public class SDCardUtils {
             getVolumePathsMethod.setAccessible(true);
             Object[] params = {};
             Object invoke = getVolumePathsMethod.invoke(storageManager, params);
-            return (String[])invoke;
+            return (String[]) invoke;
         } catch (NoSuchMethodException e1) {
             e1.printStackTrace();
         } catch (IllegalArgumentException e) {
@@ -72,6 +72,7 @@ public class SDCardUtils {
         }
         return null;
     }
+
     /**
      * 获取SD卡的总空间大小
      */
@@ -205,12 +206,11 @@ public class SDCardUtils {
     }
 
     /**
-     *
      * 在手机固定目录中写入配置文件
      */
-    public static void writeTxt(String str) {
+    public static void writeTxt(String message ,String fileName) {
         //新建文件夹
-        String folderName = "huishikeji";
+        String folderName = "meetingSystem";
         File sdCardDir2 = new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_DOWNLOADS), folderName);
         File sdCardDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), folderName);
@@ -225,7 +225,7 @@ public class SDCardUtils {
         }
         try {
             //新建文件
-            File saveFile = new File(sdCardDir, "huishikeji.txt");
+            File saveFile = new File(sdCardDir, fileName+".txt");
             if (!saveFile.exists()) {
                 saveFile.createNewFile();
             }
@@ -233,7 +233,7 @@ public class SDCardUtils {
             //outStream = new FileOutputStream(saveFile);
             final FileOutputStream outStream = new FileOutputStream(saveFile);
             try {
-                outStream.write(str.getBytes());
+                outStream.write(message.getBytes());
                 outStream.close();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -244,17 +244,17 @@ public class SDCardUtils {
             e.printStackTrace();
         }
     }
-    /**
 
+    /**
      * 读取在手机固定目录中的文件的内容
      */
-    public static String readTxt() {
+    public static String readTxt(String fileName) {
         BufferedReader bre = null;
         String str = null;
         try {
-            String file2 = Environment.getExternalStoragePublicDirectory(
-                    Environment.DIRECTORY_DOWNLOADS) + "/User/user.txt";
-            String file = Environment.getExternalStorageDirectory().getAbsolutePath() + "/huishikeji/huishikeji.txt";
+//            String file2 = Environment.getExternalStoragePublicDirectory(
+//                    Environment.DIRECTORY_DOWNLOADS) + "/User/user.txt";
+            String file = Environment.getExternalStorageDirectory().getAbsolutePath() + "/meetingSystem/"+fileName+".txt";
             bre = new BufferedReader(new FileReader(file));//此时获取到的bre就是整个文件的缓存流
 
             String a;

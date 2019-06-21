@@ -1,7 +1,5 @@
 package com.hskj.meettingsys.K780;
 
-import com.hskj.meettingsys.utils.HttpUtils;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 

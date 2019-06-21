@@ -11,10 +11,10 @@ import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.IBinder;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.hskj.meettingsys.R;
+import com.hskj.meettingsys.control.CodeConstants;
 import com.hskj.meettingsys.listener.CallBack;
 import com.hskj.meettingsys.ui.MainActivity;
 
@@ -31,24 +31,16 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static android.content.ContentValues.TAG;
-
 public class MqttService extends Service {
-
     public static String clientId = "litf";
-    //    public static final String BROKER_URL = "tcp://172.20.10.5:1883";
-//    public static final String BROKER_URL = "http://172.16.30.185:8080/send?topic=sss&content=5555bvfnhgfh";
-//    public static final String BROKER_URL = "tcp://172.16.30.185:1883";//zzx
-//    public static final String BROKER_URL = "tcp://172.16.30.234:1883";//东东
-    public static final String BROKER_URL = "tcp://172.16.30.226:1883";//浩浩
-    public static final String LOCAL_URL = "tcp://192.168.10.2111:1883";//浩浩
-    //    public static final String TOPIC = "com.ceiv.hw.communication.rx5";//东东
-    public static  String TOPIC_MEETING_LIST = "";//浩浩
-    public static  String TOPIC_MEETING_CUR = "";//浩浩
-    //    private String userName = "dongdongjia";//东东
-//    private String passWord = "dongdongjia";//东东
-    private static String userName = "atv1111";
-    private static String passWord = "atv1111";
+    public static String API_HOST = "192.168.10.2";
+    public static int API_PORT = 1883;
+    public static String IP_HOST = API_HOST + ":" + API_PORT;
+    public static String URL_QUERY = "tcp://" + IP_HOST;
+    public static String TOPIC_MEETING_LIST = "";
+    public static String TOPIC_MEETING_CUR = "";
+    private static final String userName = "atv";
+    private static final String passWord = "atv";
     private static String roomNum;//会议室编号
 
     public MqttClient mqttClient;
@@ -56,8 +48,8 @@ public class MqttService extends Service {
     private ScheduledExecutorService scheduler;
     private ConnectivityManager mConnectivityManager; //网络状态监测
     private static CallBack mCallBack;
-    private static String[] topicFilters ;
-    private static int[] qos ;
+    private static String[] topicFilters;
+    private static int[] qos;
 
     public static void setCallBack(CallBack callBack) {
         mCallBack = callBack;
@@ -97,16 +89,16 @@ public class MqttService extends Service {
      */
     public void init() {
         clientId = clientId + System.currentTimeMillis();
-        roomNum = SDCardUtils.readTxt();
+        roomNum = SDCardUtils.readTxt(CodeConstants.ROOM_NUMBER);
         TOPIC_MEETING_LIST = roomNum + "_meetList";
         TOPIC_MEETING_CUR = roomNum + "_currtMeet";
-        topicFilters = new String[]{TOPIC_MEETING_CUR,TOPIC_MEETING_LIST};
-        qos = new int[]{0,1};
-        LogUtil.i("===当前会议室编号：", roomNum+"");
+        topicFilters = new String[]{TOPIC_MEETING_CUR, TOPIC_MEETING_LIST};
+        qos = new int[]{0, 1};
+        LogUtil.i("===当前会议室编号：", roomNum + "");
 
         // todo 设置主题
         try {
-            mqttClient = new MqttClient(LOCAL_URL, clientId, new MemoryPersistence());
+            mqttClient = new MqttClient(URL_QUERY, clientId, new MemoryPersistence());
             //MQTT的连接设置
             options = new MqttConnectOptions();
             //设置是否清空session
@@ -129,8 +121,8 @@ public class MqttService extends Service {
                 }
 
                 @Override
-                public void messageArrived(String topic, MqttMessage message) throws Exception {
-                    LogUtil.i("===", "接收消息主题 : " + topic+";接收消息Qos :"  + message.getQos());
+                public void messageArrived(String topic, MqttMessage message) {
+                    LogUtil.i("===", "接收消息主题 : " + topic + ";接收消息Qos :" + message.getQos());
                     String str = new String(message.getPayload());
                     LogUtil.i("===MqttService", "topic:" + topic + ";----message:" + str);
                     mCallBack.setData(topic, str);
@@ -166,23 +158,7 @@ public class MqttService extends Service {
             connect();
         }
     }
-    public  void publish(String topic ,String jsonString,int qos) {
-        try {
-            if (mqttClient!=null) {
-                MqttMessage message = new MqttMessage();
-                message.setQos(qos);
-//                message.setRetained(isRetained);
-                message.setPayload(jsonString.getBytes());
-                mqttClient.publish(topic, message);
-                LogUtil.d("===","发送topic : "+topic+"；发送的消息msg："+jsonString);
-            }
-        } catch (MqttPersistenceException e) {
-            e.printStackTrace();
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
 
-    }
     /*连接服务器，并订阅消息主题*/
     private void connect() {
         new Thread(new Runnable() {
@@ -213,7 +189,7 @@ public class MqttService extends Service {
                     connect();
                 }
             }
-        }, 0 * 1000, 10 * 1000, TimeUnit.MILLISECONDS);
+        }, 0, 10 * 1000, TimeUnit.MILLISECONDS);
     }
 
     /**

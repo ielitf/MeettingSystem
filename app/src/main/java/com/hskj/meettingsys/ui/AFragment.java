@@ -1,13 +1,10 @@
 package com.hskj.meettingsys.ui;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,8 +24,8 @@ import com.hskj.meettingsys.bean.MqttMeetingCurrentBean;
 import com.hskj.meettingsys.bean.MqttMeetingListBean;
 import com.hskj.meettingsys.bean.JiaWeatherBean;
 import com.hskj.meettingsys.bean.WeatherBean;
+import com.hskj.meettingsys.control.CodeConstants;
 import com.hskj.meettingsys.listener.FragmentCallBackA;
-import com.hskj.meettingsys.listener.FragmentCallBackACur;
 import com.hskj.meettingsys.listener.OnGetCurrentDateTimeListener;
 import com.hskj.meettingsys.utils.DateTimeUtil;
 import com.hskj.meettingsys.utils.IPAddressUtils;
@@ -38,17 +35,14 @@ import com.hskj.meettingsys.utils.SDCardUtils;
 import com.hskj.meettingsys.utils.TimeThread;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import okhttp3.Call;
-import okhttp3.Response;
 
-public class AFragment extends Fragment implements OnGetCurrentDateTimeListener, FragmentCallBackA, FragmentCallBackACur {
+public class AFragment extends Fragment implements OnGetCurrentDateTimeListener, FragmentCallBackA{
     private GridView gridView;
     private WeatherAdapter weatherAdapter;
     private Context context;
@@ -94,21 +88,6 @@ public class AFragment extends Fragment implements OnGetCurrentDateTimeListener,
                         meetingTime.setText("");
                         meeting_bumen.setText("");
                     }
-//                    try {
-//                        LogUtil.w("========AFragment",  ";----JsonStringCurMeet:" + JsonStringCurMeet);
-//                        JSONObject jsonObject = new JSONObject(JsonStringCurMeet);
-//                        roomName.setText(jsonObject.getString("roomName"));
-//                        String startTime = DateTimeUtil.getInstance().transTimeToHHMM(jsonObject.getLong("startDate"));
-//                        String endTime = DateTimeUtil.getInstance().transTimeToHHMM(jsonObject.getLong("endDate"));
-//                        meetingTime.setText(startTime + "-" + endTime);
-//                        if (jsonObject.getString("isOpen").equals("1")) {
-//                            meetingName.setText(jsonObject.getString("meetingName"));
-//                        } else {
-//                            meetingName.setText("未公开");
-//                        }
-//                    } catch (JSONException e) {
-//                        e.printStackTrace();
-//                    }
                     break;
                 case 2:
                     if (myMeetingList.size() > 0) {
@@ -167,7 +146,6 @@ public class AFragment extends Fragment implements OnGetCurrentDateTimeListener,
         timeThread.start();
         loadWeatherData();
         MainActivity.setFragmentCallBackA(this);
-        MainActivity.setFragmentCallBackACur(this);
         listScrollUp();
         meeting_listView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
@@ -233,16 +211,6 @@ public class AFragment extends Fragment implements OnGetCurrentDateTimeListener,
     }
 
     @Override
-    public void TransDataACur(String topic, String jsonStr) {
-        LogUtil.w("========AFragment", "topic:" + topic + ";----jsonStr:" + jsonStr);
-        JsonStringCurMeet = jsonStr;
-        Message msg = new Message();
-        msg.what = 1;
-        handler.sendMessage(msg);
-
-    }
-
-    @Override
     public void TransDataA(String topic, List mList) {
         LogUtil.w("========AFragment", "topic:" + topic + ";----mList:" + mList.toString());
         if (topic.equals(MqttService.TOPIC_MEETING_CUR)) {//当前会议
@@ -267,7 +235,7 @@ public class AFragment extends Fragment implements OnGetCurrentDateTimeListener,
 
     private void initViews(View view) {
         room_num = view.findViewById(R.id.room_num);
-        room_num.setText("当前会议室编号：" + SDCardUtils.readTxt() + "");
+        room_num.setText("当前会议室编号：" + SDCardUtils.readTxt(CodeConstants.ROOM_NUMBER));
         meeting_listView = view.findViewById(R.id.meeting_list_a);
         timeTv = view.findViewById(R.id.timea);
         dataTv = view.findViewById(R.id.dataa);

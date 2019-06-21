@@ -1,15 +1,8 @@
 package com.hskj.meettingsys.ui;
 
-import android.Manifest;
-import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.DownloadManager;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -18,7 +11,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -31,22 +23,17 @@ import com.hskj.meettingsys.R;
 import com.hskj.meettingsys.adapter.MeetingAdapter;
 import com.hskj.meettingsys.bean.MqttMeetingCurrentBean;
 import com.hskj.meettingsys.bean.MqttMeetingListBean;
-import com.hskj.meettingsys.bean.ResponseAppVersion;
 import com.hskj.meettingsys.control.CodeConstants;
 import com.hskj.meettingsys.listener.CallBack;
 import com.hskj.meettingsys.listener.FragmentCallBackA;
-import com.hskj.meettingsys.listener.FragmentCallBackACur;
 import com.hskj.meettingsys.listener.FragmentCallBackB;
-import com.hskj.meettingsys.listener.FragmentCallBackBCur;
 import com.hskj.meettingsys.utils.ApkUtils;
 import com.hskj.meettingsys.utils.LogUtil;
 import com.hskj.meettingsys.utils.MqttService;
 import com.hskj.meettingsys.utils.SDCardUtils;
 import com.hskj.meettingsys.utils.SharePreferenceManager;
-import com.hskj.meettingsys.utils.ToastUtils;
 import com.hskj.meettingsys.utils.Utils;
 import com.lzy.okgo.OkGo;
-import com.lzy.okgo.callback.FileCallback;
 import com.lzy.okgo.callback.StringCallback;
 import com.lzy.okgo.model.Progress;
 import com.lzy.okgo.model.Response;
@@ -59,46 +46,27 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import okhttp3.Call;
-import pub.devrel.easypermissions.EasyPermissions;
-
 public class MainActivity extends AppCompatActivity implements CallBack, View.OnClickListener {
-    private static final int DOWNLOAD_STATUS_NEED_LOAD = 1;
-    private static final int DOWNLOAD_STATUS_RUNNING = 2;
-    private static final int DOWNLOAD_STATUS_LOADED = 3;
-    private static final int RC_WRITE_EXTERNAL_PERM = 122;
-    private ResponseAppVersion checkAPPVersion = null;
     private static FragmentCallBackA fragmentCallBackA;
     private static FragmentCallBackB fragmentCallBackB;
-    private static FragmentCallBackACur fragmentCallBackACur;
-    private static FragmentCallBackBCur fragmentCallBackBCur;
-    private Fragment mContent = null;
     private List<Fragment> frags = new ArrayList<>();
     private AFragment aFragment = new AFragment();
     private BFragment bFragment = new BFragment();
     private ViewPager viewPager;
     private MyViewPagerAdapter pagerAdapter;
-    private FragmentManager manager;
     private TextView room, cur, today, news_cur, news_today,download;
     private EditText editText;
-    private int kk;
-    private boolean aBoolean = true;
-    private String topic, strMessage;
     private int templateId;// 0 代表模板A   1代表模板2
-    private MqttService mqttService = new MqttService();
-    private boolean isFirst = true;
     private List<MqttMeetingListBean> meetingList = new ArrayList<>();
     private List<MqttMeetingCurrentBean> curMeeting = new ArrayList<>();
     private MeetingAdapter adapter = null;
-    private String JsonStringCurMeet;
     private int i = 1;
-    private TextView currentVersion, newVersion;
     private static String versionCodeOnLine,appUrl;
     private int versionCodeLocal;
+    private Intent intent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,7 +78,8 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
         setContentView(R.layout.activity_main);
         templateId = SharePreferenceManager.getMeetingMuBanType();//获取存储的磨板类型，默认值：“1”
         if (!isServiceRunning(String.valueOf(MqttService.class))) {
-            startService(new Intent(this, MqttService.class));
+            intent = new Intent(this, MqttService.class);
+            startService(intent);
         } else {
             LogUtil.i("===服务正在运行", "return");
             return;
@@ -137,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
         today = findViewById(R.id.today);
         today.setOnClickListener(this);
         editText = findViewById(R.id.edit_query);
-        editText.setText(SDCardUtils.readTxt());
+        editText.setText(SDCardUtils.readTxt("roomName"));
         viewPager = findViewById(R.id.viewPager);
 
         news_cur = findViewById(R.id.cur_news);
@@ -151,8 +120,6 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
 
     @Override
     public void setData(String topic, String strMessage) {
-        this.topic = topic;
-        this.strMessage = strMessage;
         LogUtil.w("===Main", "topic:" + topic + ";----strMessage:" + strMessage);
         if (MqttService.TOPIC_MEETING_CUR.equals(topic)) {
             //todo   当前会议
@@ -161,14 +128,11 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
                 curMeeting.clear();
                 curMeeting.addAll(JSON.parseArray(strMessage, MqttMeetingCurrentBean.class));
                 LogUtil.w("===curMeeting", "topic:" + topic + ";----curMeeting:" + curMeeting.toString());
-//                JsonStringCurMeet = strMessage;
                 if (templateId == 2) {//模板类型B
                     viewPager.setCurrentItem(1);
                 } else {
                     viewPager.setCurrentItem(0);
                 }
-//                fragmentCallBackACur.TransDataACur(topic, JsonStringCurMeet);
-//                fragmentCallBackBCur.TransDataBCur(topic, JsonStringCurMeet);
                 fragmentCallBackA.TransDataA(topic, curMeeting);
                 fragmentCallBackB.TransDataB(topic, curMeeting);
             }
@@ -224,7 +188,6 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
 //                }
                 break;
             case R.id.today_news:
-
 //                if(ceshi){
 //                    meetingList.clear();
 //                    strMessage = "[{\"bookPerson\":\"zhanghao11\",\"endDate\":1560743100000,\"id\":581,\"isOpen\":\"1\",\"name\":\"kkkk11\",\"roomName\":\"慧视科技会议室\",\"startDate\":1560742200000,\"templateId\":2},{\"bookPerson\":\"zhangsan11\",\"endDate\":1560744900000,\"id\":583,\"isOpen\":\"1\",\"name\":\"1231111\",\"roomName\":\"慧视科技会议室\",\"startDate\":1560744000000,\"templateId\":2}]";
@@ -243,18 +206,16 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
                 break;
             case R.id.room:
                 Toast.makeText(this, "会议室编号切换为：" + editText.getText(), Toast.LENGTH_SHORT).show();
-                SDCardUtils.writeTxt(editText.getText() + "");
+                SDCardUtils.writeTxt(editText.getText() + "",CodeConstants.ROOM_NUMBER);
                 MqttService.TOPIC_MEETING_LIST = editText.getText() + "_meetList";
                 MqttService.TOPIC_MEETING_CUR = editText.getText() + "_currtMeet";
                 break;
             case R.id.cur:
-//                mqttService.publish(MqttService.TOPIC_MEETING_CUR,CodeConstants.MEETING_CUR_DATA,0);
                 break;
             case R.id.today:
-//                mqttService.publish(MqttService.TOPIC_MEETING_LIST,CodeConstants.MEETING_LIST_DATA,1);
                 break;
             case R.id.download:
-                loadFile2(appUrl);
+                loadFile(appUrl);
                 break;
         }
     }
@@ -265,14 +226,6 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
 
     public static void setFragmentCallBackB(FragmentCallBackB callBack) {
         fragmentCallBackB = callBack;
-    }
-
-    public static void setFragmentCallBackACur(FragmentCallBackACur callBack) {
-        fragmentCallBackACur = callBack;
-    }
-
-    public static void setFragmentCallBackBCur(FragmentCallBackBCur callBack) {
-        fragmentCallBackBCur = callBack;
     }
 
     private class MyViewPagerAdapter extends FragmentPagerAdapter {
@@ -291,39 +244,12 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
         }
     }
 
-    private void loadFile() {
-//        String path= Environment.getExternalStorageState();
-//        String[] asd= FileUtil.getExtSDCardPath(context);
-//        String asdad=asd[0];//内置
-//        final String path2=asdad+"/"+fileName;
-        //新建文件夹
-        String folderName = "huishikeji";
-        File sdCardDir2 = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_DOWNLOADS), folderName);
-        if (!sdCardDir2.exists()) {
-            if (!sdCardDir2.mkdirs()) {
-                try {
-                    sdCardDir2.createNewFile();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        String destFileDir = sdCardDir2.getAbsolutePath();
-        // todo 检查版本更新信息
-        OkGo.<File>get("").execute(new FileCallback(destFileDir,"kkk") {
-            @Override
-            public void onSuccess(Response<File> response) {
-
-            }
-        });
-    }
-    private void loadFile2(String url){
-        String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/download";
+    private void loadFile(String url){
+        String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/download2";
         GetRequest<File> request = OkGo.<File>get(url);
         DownloadTask task = OkDownload.request("taskTag",request)
                 .save()
-//                .folder(path)
+                .folder(path)
                 .register(new DownloadListener("taskTag") {
             @Override
             public void onStart(Progress progress) {
@@ -371,7 +297,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
                             versionCodeLocal = Utils.getVersionCode(MainActivity.this);
                             if(versionCodeOnLine != null  && appUrl != null){
                                 if(Integer.parseInt(versionCodeOnLine) >versionCodeLocal ){
-                                    loadFile2(appUrl);
+                                    loadFile(appUrl);
                                 }
                             }
                         } catch (JSONException e) {
@@ -391,8 +317,15 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
     }
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
+        stopService(intent);
     }
 
 }

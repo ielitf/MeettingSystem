@@ -1,10 +1,13 @@
 package com.hskj.meettingsys.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +15,6 @@ import android.widget.AbsListView;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
-
 import com.alibaba.fastjson.JSON;
 import com.hskj.meettingsys.K780.K780Utils;
 import com.hskj.meettingsys.R;
@@ -39,12 +41,10 @@ import com.lzy.okgo.callback.StringCallback;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-
 import okhttp3.Call;
 import okhttp3.Response;
 
@@ -194,19 +194,20 @@ public class AFragment extends Fragment implements OnGetCurrentDateTimeListener,
         timingAgain();
         ip = IPAddressUtils.getAndroidIp(context);
         LogUtil.i("===", ip);
-        OkGo.get("http://api.k780.com:88/?")
+        OkGo.<String>get("http://api.k780.com:88/?")
                 .params("app", "weather.future")
-                .params("weaid", ip)
+//                .params("weaid", ip)
+                .params("weaid", 2277)//涞水
                 .params("appkey", K780Utils.APPKEY)
                 .params("sign", K780Utils.SIGN)
                 .params("format", "json")
                 .execute(new StringCallback() {
                     @Override
-                    public void onSuccess(String s, Call call, Response response) {
-                        LogUtil.w("=========天气", s);
+                    public void onSuccess(com.lzy.okgo.model.Response<String> response) {
+                        LogUtil.w("=========天气", response.body());
                         if (response.code() == 200) {
                             try {
-                                JSONObject jsonObject = new JSONObject(s);
+                                JSONObject jsonObject = new JSONObject(response.body());
                                 String content = jsonObject.getString("result");
                                 weatherList.clear();
                                 weatherList.addAll(JSON.parseArray(content, WeatherBean.class));
@@ -275,6 +276,18 @@ public class AFragment extends Fragment implements OnGetCurrentDateTimeListener,
         meetingTime = view.findViewById(R.id.current_meeting_time_a);
         meeting_bumen = view.findViewById(R.id.current_meeting_bm_a);
         gridView = view.findViewById(R.id.weather_a);
+//
+//        ViewTreeObserver observer = meetingName.getViewTreeObserver(); // textAbstract为TextView控件
+//        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+//            @Override
+//            public void onGlobalLayout() {
+//                ViewTreeObserver obs = meetingName.getViewTreeObserver();
+//                obs.removeGlobalOnLayoutListener(this);
+//                if (meetingName.getLineCount() >= 2) {
+//                    meetingName.setTextSize(25);
+//                }
+//            }
+//        });
     }
 
     @Override

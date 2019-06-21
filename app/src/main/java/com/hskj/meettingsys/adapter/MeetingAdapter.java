@@ -66,6 +66,8 @@ public class MeetingAdapter extends MyBaseAdapter2<MqttMeetingListBean> {
             holderView.title.setText(item.getName());
         }
         holderView.order.setText(item.getBookPerson());
+//        convertView.measure(0,0);
+//         int height=convertView.getMeasuredHeight();
         return convertView;
     }
 

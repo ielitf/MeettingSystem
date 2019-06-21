@@ -23,7 +23,6 @@
     style="@style/meeting_item"
     android:layout_weight="2"
     android:text="新产品讨论会"
-    android:singleLine="true"
     />
 <TextView
     android:id="@+id/meeting_order"

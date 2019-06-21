@@ -41,14 +41,14 @@ public class MqttService extends Service {
 //    public static final String BROKER_URL = "tcp://172.16.30.185:1883";//zzx
 //    public static final String BROKER_URL = "tcp://172.16.30.234:1883";//东东
     public static final String BROKER_URL = "tcp://172.16.30.226:1883";//浩浩
-    public static final String LOCAL_URL = "tcp://192.168.10.2:1883";//浩浩
+    public static final String LOCAL_URL = "tcp://192.168.10.2111:1883";//浩浩
     //    public static final String TOPIC = "com.ceiv.hw.communication.rx5";//东东
     public static  String TOPIC_MEETING_LIST = "";//浩浩
     public static  String TOPIC_MEETING_CUR = "";//浩浩
     //    private String userName = "dongdongjia";//东东
 //    private String passWord = "dongdongjia";//东东
-    private static String userName = "atv";
-    private static String passWord = "atv";
+    private static String userName = "atv1111";
+    private static String passWord = "atv1111";
     private static String roomNum;//会议室编号
 
     public MqttClient mqttClient;
@@ -75,7 +75,7 @@ public class MqttService extends Service {
                 getActivity(this, 0, nfIntent, 0)) // 设置PendingIntent
                 .setLargeIcon(BitmapFactory.decodeResource(this.getResources(),
                         R.mipmap.ic_launcher))
-                .setContentTitle("com.ceiv")
+                .setContentTitle("com.litf")
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentText("namePlate正在运行")
                 .setWhen(System.currentTimeMillis());

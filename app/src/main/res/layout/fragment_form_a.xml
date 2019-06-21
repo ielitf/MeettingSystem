@@ -54,7 +54,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:ellipsize="marquee"
-                    android:singleLine="true"
+                    android:maxLines="2"
                     android:text="当前无会议"
                     android:textColor="@color/white"
                     android:textSize="@dimen/a_meeting_cur_name" />

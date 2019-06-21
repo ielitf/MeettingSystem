@@ -38,7 +38,7 @@ public class HttpUtils {
 			// 释放资源
 			if (conn != null) {
 				conn.disconnect();
-				conn = null;
+//				conn = null;
 			}
 		}
 		return null;

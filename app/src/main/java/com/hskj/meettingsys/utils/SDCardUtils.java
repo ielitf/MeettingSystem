@@ -1,7 +1,9 @@
 package com.hskj.meettingsys.utils;
 
+import android.content.Context;
 import android.os.Environment;
 import android.os.StatFs;
+import android.os.storage.StorageManager;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -12,6 +14,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
  * SD卡的操作工作类
@@ -43,7 +47,31 @@ public class SDCardUtils {
             return null;
         }
     }
-
+    /**
+     * 获取外置SD卡路径
+     *
+     */
+    public static String[] getExtSDCardPath(Context context) {
+        StorageManager storageManager = (StorageManager) context.getSystemService(Context
+                .STORAGE_SERVICE);
+        try {
+            Class<?>[] paramClasses = {};
+            Method getVolumePathsMethod = StorageManager.class.getMethod("getVolumePaths", paramClasses);
+            getVolumePathsMethod.setAccessible(true);
+            Object[] params = {};
+            Object invoke = getVolumePathsMethod.invoke(storageManager, params);
+            return (String[])invoke;
+        } catch (NoSuchMethodException e1) {
+            e1.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
     /**
      * 获取SD卡的总空间大小
      */

@@ -1,8 +1,16 @@
 package com.hskj.meettingsys.ui;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -10,6 +18,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -22,23 +31,47 @@ import com.hskj.meettingsys.R;
 import com.hskj.meettingsys.adapter.MeetingAdapter;
 import com.hskj.meettingsys.bean.MqttMeetingCurrentBean;
 import com.hskj.meettingsys.bean.MqttMeetingListBean;
+import com.hskj.meettingsys.bean.ResponseAppVersion;
+import com.hskj.meettingsys.control.CodeConstants;
 import com.hskj.meettingsys.listener.CallBack;
 import com.hskj.meettingsys.listener.FragmentCallBackA;
 import com.hskj.meettingsys.listener.FragmentCallBackACur;
 import com.hskj.meettingsys.listener.FragmentCallBackB;
 import com.hskj.meettingsys.listener.FragmentCallBackBCur;
+import com.hskj.meettingsys.utils.ApkUtils;
 import com.hskj.meettingsys.utils.LogUtil;
 import com.hskj.meettingsys.utils.MqttService;
 import com.hskj.meettingsys.utils.SDCardUtils;
 import com.hskj.meettingsys.utils.SharePreferenceManager;
+import com.hskj.meettingsys.utils.ToastUtils;
+import com.hskj.meettingsys.utils.Utils;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.FileCallback;
+import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.Progress;
+import com.lzy.okgo.model.Response;
+import com.lzy.okgo.request.GetRequest;
+import com.lzy.okserver.OkDownload;
+import com.lzy.okserver.download.DownloadListener;
+import com.lzy.okserver.download.DownloadTask;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.Call;
+import pub.devrel.easypermissions.EasyPermissions;
+
 public class MainActivity extends AppCompatActivity implements CallBack, View.OnClickListener {
+    private static final int DOWNLOAD_STATUS_NEED_LOAD = 1;
+    private static final int DOWNLOAD_STATUS_RUNNING = 2;
+    private static final int DOWNLOAD_STATUS_LOADED = 3;
+    private static final int RC_WRITE_EXTERNAL_PERM = 122;
+    private ResponseAppVersion checkAPPVersion = null;
     private static FragmentCallBackA fragmentCallBackA;
     private static FragmentCallBackB fragmentCallBackB;
     private static FragmentCallBackACur fragmentCallBackACur;
@@ -50,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
     private ViewPager viewPager;
     private MyViewPagerAdapter pagerAdapter;
     private FragmentManager manager;
-    private TextView room, cur, today, news_cur, news_today;
+    private TextView room, cur, today, news_cur, news_today,download;
     private EditText editText;
     private int kk;
     private boolean aBoolean = true;
@@ -62,6 +95,10 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
     private List<MqttMeetingCurrentBean> curMeeting = new ArrayList<>();
     private MeetingAdapter adapter = null;
     private String JsonStringCurMeet;
+    private int i = 1;
+    private TextView currentVersion, newVersion;
+    private static String versionCodeOnLine,appUrl;
+    private int versionCodeLocal;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
         } else {
             viewPager.setCurrentItem(1);
         }
+        checkVersion();
     }
 
     private void initViews() {
@@ -106,6 +144,9 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
         news_today = findViewById(R.id.today_news);
         news_cur.setOnClickListener(this);
         news_today.setOnClickListener(this);
+        download = findViewById(R.id.download);
+        download.setOnClickListener(this);
+
     }
 
     @Override
@@ -119,6 +160,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
                 templateId = SharePreferenceManager.getMeetingMuBanType();//读取存储的模板类型
                 curMeeting.clear();
                 curMeeting.addAll(JSON.parseArray(strMessage, MqttMeetingCurrentBean.class));
+                LogUtil.w("===curMeeting", "topic:" + topic + ";----curMeeting:" + curMeeting.toString());
 //                JsonStringCurMeet = strMessage;
                 if (templateId == 2) {//模板类型B
                     viewPager.setCurrentItem(1);
@@ -137,6 +179,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
             if (!"".equals(strMessage) &&!"[]".equals(strMessage) && strMessage != null && !TextUtils.isEmpty(strMessage)) {
                 meetingList.clear();
                 meetingList.addAll(JSON.parseArray(strMessage, MqttMeetingListBean.class));
+                LogUtil.w("===meetingList", "topic:" + topic + ";----meetingList:" + meetingList.toString());
                 templateId = meetingList.get(0).getTemplateId();
                 SharePreferenceManager.setMeetingMuBanType(templateId);//将模板类型存到本地缓存中
 
@@ -149,12 +192,6 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
                 fragmentCallBackB.TransDataB(topic, meetingList);
             }
         }
-    }
-
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
     }
 
     /**
@@ -209,13 +246,15 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
                 SDCardUtils.writeTxt(editText.getText() + "");
                 MqttService.TOPIC_MEETING_LIST = editText.getText() + "_meetList";
                 MqttService.TOPIC_MEETING_CUR = editText.getText() + "_currtMeet";
-                ;
                 break;
             case R.id.cur:
 //                mqttService.publish(MqttService.TOPIC_MEETING_CUR,CodeConstants.MEETING_CUR_DATA,0);
                 break;
             case R.id.today:
 //                mqttService.publish(MqttService.TOPIC_MEETING_LIST,CodeConstants.MEETING_LIST_DATA,1);
+                break;
+            case R.id.download:
+                loadFile2(appUrl);
                 break;
         }
     }
@@ -251,4 +290,109 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
             return frags == null ? 0 : frags.size();
         }
     }
+
+    private void loadFile() {
+//        String path= Environment.getExternalStorageState();
+//        String[] asd= FileUtil.getExtSDCardPath(context);
+//        String asdad=asd[0];//内置
+//        final String path2=asdad+"/"+fileName;
+        //新建文件夹
+        String folderName = "huishikeji";
+        File sdCardDir2 = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DOWNLOADS), folderName);
+        if (!sdCardDir2.exists()) {
+            if (!sdCardDir2.mkdirs()) {
+                try {
+                    sdCardDir2.createNewFile();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        String destFileDir = sdCardDir2.getAbsolutePath();
+        // todo 检查版本更新信息
+        OkGo.<File>get("").execute(new FileCallback(destFileDir,"kkk") {
+            @Override
+            public void onSuccess(Response<File> response) {
+
+            }
+        });
+    }
+    private void loadFile2(String url){
+        String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/download";
+        GetRequest<File> request = OkGo.<File>get(url);
+        DownloadTask task = OkDownload.request("taskTag",request)
+                .save()
+//                .folder(path)
+                .register(new DownloadListener("taskTag") {
+            @Override
+            public void onStart(Progress progress) {
+                LogUtil.d("apk","onStart");
+            }
+
+            @Override
+            public void onProgress(Progress progress) {
+                LogUtil.d("apk","onProgress");
+            }
+
+            @Override
+            public void onError(Progress progress) {
+                LogUtil.d("apk","onError");
+            }
+
+            @Override
+            public void onFinish(File file, Progress progress) {
+                LogUtil.d("apk",file.getAbsolutePath());
+                ApkUtils.install(MainActivity.this,file);
+            }
+
+            @Override
+            public void onRemove(Progress progress) {
+                LogUtil.d("apk","onRemove");
+            }
+        });
+//        task.start();//开始或者继续下载
+//        task.pause();//暂停下载
+//        task.remove();//删除下载，只删除记录，不删除文件
+//        task.remove(true);//删除下载，同时删除记录和文件
+        task.restart();//重新下载
+    }
+    public void checkVersion() {
+
+        OkGo.<String>get("http://192.168.10.120:8080/app/uploadVersionInfo")
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(Response<String> response) {
+                        LogUtil.d("===",response.body());
+                        try {
+                            JSONObject jsonObject = new JSONObject(response.body());
+                            versionCodeOnLine = jsonObject.getString("code");
+                            appUrl = jsonObject.getString("url");
+                            versionCodeLocal = Utils.getVersionCode(MainActivity.this);
+                            if(versionCodeOnLine != null  && appUrl != null){
+                                if(Integer.parseInt(versionCodeOnLine) >versionCodeLocal ){
+                                    loadFile2(appUrl);
+                                }
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    @Override
+                    public void onError(Response<String> response) {
+                        super.onError(response);
+                    }
+
+                    @Override
+                    public void onFinish() {
+
+                    }
+                });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
 }

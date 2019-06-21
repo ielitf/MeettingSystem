@@ -1,21 +1,12 @@
 package com.hskj.meettingsys.bean;
 
 public class MqttMeetingCurrentBean {
-    private String department;//部门
     private long endDate;//结束时间
     private String isOpen;//是否公开  字符串1:公开 0:未公开
     private int meetingId;
     private String meetingName;//会议主题名称
     private String roomName;//会议室名称
     private long startDate;//开始时间
-
-    public String getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(String department) {
-        this.department = department;
-    }
 
     public String getIsOpen() {
         return isOpen;
@@ -68,8 +59,7 @@ public class MqttMeetingCurrentBean {
     @Override
     public String toString() {
         return "MqttMeetingCurrentBean{" +
-                "department='" + department + '\'' +
-                ", endDate=" + endDate +
+                "endDate=" + endDate +
                 ", isOpen='" + isOpen + '\'' +
                 ", meetingId=" + meetingId +
                 ", meetingName='" + meetingName + '\'' +

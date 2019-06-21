@@ -195,19 +195,20 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
         timingAgain();
         ip = IPAddressUtils.getAndroidIp(context);
         LogUtil.i("===", ip);
-        OkGo.get("http://api.k780.com:88/?")
+        OkGo.<String>get("http://api.k780.com:88/?")
                 .params("app", "weather.future")
                 .params("weaid", ip)
+                .params("weaid", 2277)//涞水
                 .params("appkey", K780Utils.APPKEY)
                 .params("sign", K780Utils.SIGN)
                 .params("format", "json")
                 .execute(new StringCallback() {
                     @Override
-                    public void onSuccess(String s, Call call, Response response) {
-                        LogUtil.w("=========天气", s);
+                    public void onSuccess(com.lzy.okgo.model.Response<String> response) {
+                        LogUtil.w("=========天气", response.body());
                         if (response.code() == 200) {
                             try {
-                                JSONObject jsonObject = new JSONObject(s);
+                                JSONObject jsonObject = new JSONObject(response.body());
                                 String content = jsonObject.getString("result");
                                 weatherList.clear();
                                 weatherList.addAll(JSON.parseArray(content, WeatherBean.class));

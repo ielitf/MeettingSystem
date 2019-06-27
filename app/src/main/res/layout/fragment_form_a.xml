@@ -215,8 +215,9 @@
                     android:layout_marginTop="@dimen/px30_dp"
                     android:gravity="center"
                     android:ellipsize="marquee"
+                    android:marqueeRepeatLimit="marquee_forever"
                     android:singleLine="true"
-                    android:text="会议室"
+                    android:text="会议室会议室会议室会议室"
                     android:textColor="@color/white"
                     android:textSize="@dimen/a_meeting_room_name" />
 

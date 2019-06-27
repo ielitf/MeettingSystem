@@ -4,6 +4,8 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -32,6 +34,7 @@ import com.hskj.meettingsys.utils.LogUtil;
 import com.hskj.meettingsys.utils.MqttService;
 import com.hskj.meettingsys.utils.SDCardUtils;
 import com.hskj.meettingsys.utils.SharePreferenceManager;
+import com.hskj.meettingsys.utils.ToastUtils;
 import com.hskj.meettingsys.utils.Utils;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
@@ -67,6 +70,14 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
     private static String versionCodeOnLine,appUrl;
     private int versionCodeLocal;
     private Intent intent;
+    private Handler handler = new  Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+
+
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -215,6 +226,8 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
             case R.id.today:
                 break;
             case R.id.download:
+
+
                 loadFile(appUrl);
                 break;
         }
@@ -285,19 +298,26 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
     }
     public void checkVersion() {
 
-        OkGo.<String>get("http://192.168.10.120:8080/app/uploadVersionInfo")
+//        OkGo.<String>get("http://192.168.10.120:8080/app/uploadVersionInfo")
+        OkGo.<String>get("http://"+SDCardUtils.readTxt(CodeConstants.IP_HOST_APP)+"/app/uploadVersionInfo")
                 .execute(new StringCallback() {
                     @Override
                     public void onSuccess(Response<String> response) {
                         LogUtil.d("===",response.body());
                         try {
                             JSONObject jsonObject = new JSONObject(response.body());
+                            ToastUtils.showToast(MainActivity.this,"收到的更新信息为："+jsonObject.toString());
                             versionCodeOnLine = jsonObject.getString("code");
                             appUrl = jsonObject.getString("url");
                             versionCodeLocal = Utils.getVersionCode(MainActivity.this);
                             if(versionCodeOnLine != null  && appUrl != null){
+                                ToastUtils.showToast(MainActivity.this,"更新的版本号为："+versionCodeOnLine);
+                                if(versionCodeOnLine!=null){
                                 if(Integer.parseInt(versionCodeOnLine) >versionCodeLocal ){
+                                    ToastUtils.showToast(MainActivity.this,"开始更新：");
                                     loadFile(appUrl);
+
+                                }
                                 }
                             }
                         } catch (JSONException e) {

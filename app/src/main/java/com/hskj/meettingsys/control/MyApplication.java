@@ -21,10 +21,13 @@ public class MyApplication extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		CrashHandler crashHandler = CrashHandler.getInstance();
+		crashHandler.init(this);
 		SharePreferenceManager.init(getApplicationContext(), SHARED_PREFERENCE_NAME);
 		if(SharePreferenceManager.getIsFirstUse()){
 			SDCardUtils.writeTxt("001",CodeConstants.ROOM_NUMBER);
-			SDCardUtils.writeTxt("192.168.10.2:1883",CodeConstants.IP_HOST);
+			SDCardUtils.writeTxt("192.168.10.2:1883",CodeConstants.IP_HOST_NEWS);
+			SDCardUtils.writeTxt("192.168.10.120:8080",CodeConstants.IP_HOST_APP);
 			SharePreferenceManager.setIsFirstUse(false);
 		}
 		//全局初始化

@@ -32,13 +32,16 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class MqttService extends Service {
-    public static String clientId = "litf";
+    public static String clientId = "1111litf1111";
+//    public static String API_HOST = "c.huihuinet.cn";
     public static String API_HOST = "192.168.10.2";
     public static int API_PORT = 1883;
-    public static String IP_HOST = API_HOST + ":" + API_PORT;
-    public static String URL_QUERY = "tcp://" + IP_HOST;
+    public static String IP_HOST_NEWS = API_HOST + ":" + API_PORT;
+    public static String URL_QUERY = "tcp://" + IP_HOST_NEWS;
     public static String TOPIC_MEETING_LIST = "";
     public static String TOPIC_MEETING_CUR = "";
+//    private static final String userName = "zzx";
+//    private static final String passWord = "zzx";
     private static final String userName = "atv";
     private static final String passWord = "atv";
     private static String roomNum;//会议室编号
@@ -88,8 +91,10 @@ public class MqttService extends Service {
      * 初始化相关数据
      */
     public void init() {
-        clientId = clientId + System.currentTimeMillis();
+//        clientId = clientId + System.currentTimeMillis();
         roomNum = SDCardUtils.readTxt(CodeConstants.ROOM_NUMBER);
+        IP_HOST_NEWS = SDCardUtils.readTxt(CodeConstants.IP_HOST_NEWS);
+        URL_QUERY = "tcp://" + IP_HOST_NEWS;
         TOPIC_MEETING_LIST = roomNum + "_meetList";
         TOPIC_MEETING_CUR = roomNum + "_currtMeet";
         topicFilters = new String[]{TOPIC_MEETING_CUR, TOPIC_MEETING_LIST};
@@ -102,7 +107,7 @@ public class MqttService extends Service {
             //MQTT的连接设置
             options = new MqttConnectOptions();
             //设置是否清空session
-            options.setCleanSession(true);
+            options.setCleanSession(false);
             //设置连接的用户名
             options.setUserName(userName);
             //设置连接的密码

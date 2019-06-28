@@ -42,8 +42,8 @@ public class MqttService extends Service {
     public static String TOPIC_MEETING_CUR = "";
 //    private static final String userName = "zzx";
 //    private static final String passWord = "zzx";
-    private static final String userName = "atv";
-    private static final String passWord = "atv";
+    private static final String userName = "atv0";
+    private static final String passWord = "atv0";
     private static String roomNum;//会议室编号
 
     public MqttClient mqttClient;
@@ -99,7 +99,9 @@ public class MqttService extends Service {
         TOPIC_MEETING_CUR = roomNum + "_currtMeet";
         topicFilters = new String[]{TOPIC_MEETING_CUR, TOPIC_MEETING_LIST};
         qos = new int[]{0, 1};
+        LogUtil.i("===ip：", URL_QUERY );
         LogUtil.i("===当前会议室编号：", roomNum + "");
+        LogUtil.i("===主题：", TOPIC_MEETING_LIST+"---" +TOPIC_MEETING_CUR);
 
         // todo 设置主题
         try {

@@ -13,6 +13,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -26,10 +27,14 @@ import com.hskj.meettingsys.adapter.MeetingAdapter;
 import com.hskj.meettingsys.bean.MqttMeetingCurrentBean;
 import com.hskj.meettingsys.bean.MqttMeetingListBean;
 import com.hskj.meettingsys.control.CodeConstants;
+import com.hskj.meettingsys.greendao.DaoMaster;
+import com.hskj.meettingsys.greendao.DaoSession;
+import com.hskj.meettingsys.greendao.MqttMeetingListBeanDao;
 import com.hskj.meettingsys.listener.CallBack;
 import com.hskj.meettingsys.listener.FragmentCallBackA;
 import com.hskj.meettingsys.listener.FragmentCallBackB;
 import com.hskj.meettingsys.utils.ApkUtils;
+import com.hskj.meettingsys.utils.DateTimeUtil;
 import com.hskj.meettingsys.utils.LogUtil;
 import com.hskj.meettingsys.utils.MqttService;
 import com.hskj.meettingsys.utils.SDCardUtils;
@@ -60,24 +65,34 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
     private BFragment bFragment = new BFragment();
     private ViewPager viewPager;
     private MyViewPagerAdapter pagerAdapter;
-    private TextView room, cur, today, news_cur, news_today,download;
+    private TextView room, cur, today, news_cur, news_today, download;
     private EditText editText;
     private int templateId;// 0 代表模板A   1代表模板2
-    private List<MqttMeetingListBean> meetingList = new ArrayList<>();
+    private List<MqttMeetingListBean> meetingListQuery = new ArrayList<>();
+    private List<MqttMeetingListBean> meetingListReceive = new ArrayList<>();
     private List<MqttMeetingCurrentBean> curMeeting = new ArrayList<>();
     private MeetingAdapter adapter = null;
-    private int i = 1;
-    private static String versionCodeOnLine,appUrl;
+    private static String versionCodeOnLine, appUrl;
     private int versionCodeLocal;
     private Intent intent;
-    private Handler handler = new  Handler(){
+    private DateTimeUtil dateTimeUtil;
+
+    private DaoMaster daoMaster;
+    private DaoSession daoSession;
+    private MqttMeetingListBeanDao meetingListBeanDao;
+    private MqttMeetingListBean mqttMeetingListBean;
+
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
+            switch (msg.what){
 
+            }
 
         }
     };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,6 +102,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
         // 去除标题栏
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
+        dateTimeUtil = DateTimeUtil.getInstance();
         templateId = SharePreferenceManager.getMeetingMuBanType();//获取存储的磨板类型，默认值：“1”
         if (!isServiceRunning(String.valueOf(MqttService.class))) {
             intent = new Intent(this, MqttService.class);
@@ -96,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
             return;
         }
         MqttService.setCallBack(this);
+        getStuDao();
         initViews();
         frags.add(aFragment);
         frags.add(bFragment);
@@ -106,7 +123,53 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
         } else {
             viewPager.setCurrentItem(1);
         }
+
+        //删除数据库中今天之前的会议信息
+        List<MqttMeetingListBean> userList = meetingListBeanDao.queryBuilder().where(MqttMeetingListBeanDao.Properties.StartDate.lt(dateTimeUtil.transDataToTime(dateTimeUtil.getCurrentDateYYMMDD()+" 00:00:00"))).build().list();
+        for (MqttMeetingListBean user : userList) {
+            meetingListBeanDao.delete(user);
+        }
+
+        //开个线程：1小时查一次，并更新页面，万一用户好几天不关机，结果到了第二天，显示的还是今天的信息，就操蛋额。哎。
+        //只是这个时间设置多少合适呢？
+        new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                do {
+                    try {
+                        sleep(3*1000);//防止一开机就收到信息，而此时页面尚未构建完成，造成空指针异常：
+                        meetingListQuery.clear();
+                        meetingListQuery.addAll(meetingListBeanDao.queryBuilder().where(MqttMeetingListBeanDao.Properties.StartDate
+                                .between(dateTimeUtil.transDataToTime(dateTimeUtil.getCurrentDateYYMMDD()+" 00:00:00"),dateTimeUtil.transDataToTime(dateTimeUtil.getCurrentDateYYMMDD()+" 23:59:59")))
+                                .orderAsc(MqttMeetingListBeanDao.Properties.EndDate)
+                                .build().list());
+                        if(meetingListQuery.size()>0){
+                            fragmentCallBackA.TransDataA(MqttService.TOPIC_MEETING_LIST, meetingListQuery);
+                            fragmentCallBackB.TransDataB(MqttService.TOPIC_MEETING_LIST, meetingListQuery);
+                        }
+                        sleep(60*60*1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                } while (true) ;
+
+            }
+        }.start();
+
         checkVersion();
+    }
+
+    /**
+     * 获取StudentDao
+     */
+    private void getStuDao() {
+       // 创建数据
+        DaoMaster.DevOpenHelper devOpenHelper = new DaoMaster.DevOpenHelper(this, "meetingList.db", null);
+        daoMaster = new DaoMaster(devOpenHelper.getWritableDb());
+        daoSession = daoMaster.newSession();
+        meetingListBeanDao = daoSession.getMqttMeetingListBeanDao();
+
     }
 
     private void initViews() {
@@ -151,11 +214,11 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
 
         if (MqttService.TOPIC_MEETING_LIST.equals(topic)) {
             //todo   会议列表
-            if (!"".equals(strMessage) &&!"[]".equals(strMessage) && strMessage != null && !TextUtils.isEmpty(strMessage)) {
-                meetingList.clear();
-                meetingList.addAll(JSON.parseArray(strMessage, MqttMeetingListBean.class));
-                LogUtil.w("===meetingList", "topic:" + topic + ";----meetingList:" + meetingList.toString());
-                templateId = meetingList.get(0).getTemplateId();
+            if (!"".equals(strMessage) && !"[]".equals(strMessage) && strMessage != null && !TextUtils.isEmpty(strMessage)) {
+                meetingListReceive.clear();
+                meetingListReceive.addAll(JSON.parseArray(strMessage, MqttMeetingListBean.class));
+                LogUtil.w("===meetingList", "topic:" + topic + ";----meetingList:" + meetingListReceive.toString());
+                templateId = meetingListReceive.get(0).getTemplateId();
                 SharePreferenceManager.setMeetingMuBanType(templateId);//将模板类型存到本地缓存中
 
                 if (templateId == 2) {//模板B
@@ -163,8 +226,47 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
                 } else {//模板a
                     viewPager.setCurrentItem(0);
                 }
-                fragmentCallBackA.TransDataA(topic, meetingList);
-                fragmentCallBackB.TransDataB(topic, meetingList);
+
+                switch (meetingListReceive.get(0).getSign()) {
+                    case "insert":
+                        try {
+                            mqttMeetingListBean = new MqttMeetingListBean(null,
+                                    meetingListReceive.get(0).getId(),
+                                    meetingListReceive.get(0).getRoomName(),
+                                    meetingListReceive.get(0).getName(),
+                                    meetingListReceive.get(0).getIsOpen(),
+                                    meetingListReceive.get(0).getEndDate(),
+                                    meetingListReceive.get(0).getStartDate(),
+                                    meetingListReceive.get(0).getTemplateId(),
+                                    meetingListReceive.get(0).getBookPerson(),
+                                    meetingListReceive.get(0).getSign())
+                            ;
+                            meetingListBeanDao.insert(mqttMeetingListBean);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                            LogUtil.w("===Exception", "插入失败"+e.getMessage());
+                        }
+                        break;
+                    case "delete":
+                        mqttMeetingListBean = meetingListBeanDao.queryBuilder().where(MqttMeetingListBeanDao.Properties.Id .eq(meetingListReceive.get(0).getId())).build().unique();
+                        if(mqttMeetingListBean != null){
+                            meetingListBeanDao.delete(mqttMeetingListBean);
+                        }
+                        break;
+                    case "update":
+                        mqttMeetingListBean = meetingListBeanDao.queryBuilder().where(MqttMeetingListBeanDao.Properties.Id .eq(meetingListReceive.get(0).getId())).build().unique();
+                        if(mqttMeetingListBean != null){
+                            meetingListBeanDao.update(mqttMeetingListBean);
+                        }
+                        break;
+                }
+                meetingListQuery.clear();
+                meetingListQuery.addAll(meetingListBeanDao.queryBuilder().where(MqttMeetingListBeanDao.Properties.StartDate
+                        .between(dateTimeUtil.transDataToTime(dateTimeUtil.getCurrentDateYYMMDD()+" 00:00:00"),dateTimeUtil.transDataToTime(dateTimeUtil.getCurrentDateYYMMDD()+" 23:59:59")))
+                        .orderAsc(MqttMeetingListBeanDao.Properties.EndDate)
+                        .build().list());
+                    fragmentCallBackA.TransDataA(topic, meetingListQuery);
+                    fragmentCallBackB.TransDataB(topic, meetingListQuery);
             }
         }
     }
@@ -181,7 +283,9 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
         }
         return false;
     }
+
     Boolean ceshi = true;
+    int i = 0;
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -198,7 +302,7 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
 //                    ceshi = true;
 //                }
                 break;
-            case R.id.today_news:
+            case R.id.today_news://删除
 //                if(ceshi){
 //                    meetingList.clear();
 //                    strMessage = "[{\"bookPerson\":\"zhanghao11\",\"endDate\":1560743100000,\"id\":581,\"isOpen\":\"1\",\"name\":\"kkkk11\",\"roomName\":\"慧视科技会议室\",\"startDate\":1560742200000,\"templateId\":2},{\"bookPerson\":\"zhangsan11\",\"endDate\":1560744900000,\"id\":583,\"isOpen\":\"1\",\"name\":\"1231111\",\"roomName\":\"慧视科技会议室\",\"startDate\":1560744000000,\"templateId\":2}]";
@@ -214,23 +318,59 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
 //                    fragmentCallBackB.TransDataB("001_meetList", meetingList);
 //                    ceshi = true;
 //                }
+                List<MqttMeetingListBean> userList = meetingListBeanDao.queryBuilder().where(MqttMeetingListBeanDao.Properties.StartDate.lt(System.currentTimeMillis())).build().list();
+                for (MqttMeetingListBean user : userList) {
+                    meetingListBeanDao.delete(user);
+                }
                 break;
             case R.id.room:
                 Toast.makeText(this, "会议室编号切换为：" + editText.getText(), Toast.LENGTH_SHORT).show();
-                SDCardUtils.writeTxt(editText.getText() + "",CodeConstants.ROOM_NUMBER);
+                SDCardUtils.writeTxt(editText.getText() + "", CodeConstants.ROOM_NUMBER);
                 MqttService.TOPIC_MEETING_LIST = editText.getText() + "_meetList";
                 MqttService.TOPIC_MEETING_CUR = editText.getText() + "_currtMeet";
                 break;
-            case R.id.cur:
+            case R.id.cur://查询
+                List<MqttMeetingListBean> list = meetingListBeanDao.queryBuilder()
+//                        .where(MqttMeetingListBeanDao.Properties.StartDate
+////                        .eq(DateTimeUtil.getInstance().getCurrentDateMMDD()))
+//                        .eq("06-27"))
+                        .orderAsc(MqttMeetingListBeanDao.Properties.EndDate)
+                        .build().list();
+
+                for (int i = 0; i < list.size(); i++) {
+                    Log.d("====", "query: " + list.get(i).toString());
+                }
                 break;
-            case R.id.today:
+            case R.id.today://插入
+                try {
+                    mqttMeetingListBean = new MqttMeetingListBean(null,
+                            ++i,
+                            "会议室"+i,
+                            "主题"+i,
+                            "1",
+                            System.currentTimeMillis(),
+                            System.currentTimeMillis(),
+                            2,
+                            "张三"+i,
+                            "insert");
+                    meetingListBeanDao.insert(mqttMeetingListBean);
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                    LogUtil.w("===Exception", "插入失败"+e.getMessage());
+                }
                 break;
             case R.id.download:
-
-
                 loadFile(appUrl);
                 break;
         }
+        meetingListQuery.clear();
+        meetingListQuery.addAll(meetingListBeanDao.queryBuilder().where(MqttMeetingListBeanDao.Properties.StartDate
+                .between(dateTimeUtil.transDataToTime(dateTimeUtil.getCurrentDateYYMMDD()+" 00:00:00"),dateTimeUtil.transDataToTime(dateTimeUtil.getCurrentDateYYMMDD()+" 23:59:59")))
+                .orderAsc(MqttMeetingListBeanDao.Properties.EndDate)
+                .build().list());
+            fragmentCallBackA.TransDataA(MqttService.TOPIC_MEETING_LIST, meetingListQuery);
+            fragmentCallBackB.TransDataB(MqttService.TOPIC_MEETING_LIST, meetingListQuery);
     }
 
     public static void setFragmentCallBackA(FragmentCallBackA callBack) {
@@ -257,73 +397,74 @@ public class MainActivity extends AppCompatActivity implements CallBack, View.On
         }
     }
 
-    private void loadFile(String url){
-        String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/download2";
+    private void loadFile(String url) {
+        String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/download2";
         GetRequest<File> request = OkGo.<File>get(url);
-        DownloadTask task = OkDownload.request("taskTag",request)
+        DownloadTask task = OkDownload.request("taskTag", request)
                 .save()
                 .folder(path)
                 .register(new DownloadListener("taskTag") {
-            @Override
-            public void onStart(Progress progress) {
-                LogUtil.d("apk","onStart");
-            }
+                    @Override
+                    public void onStart(Progress progress) {
+                        LogUtil.d("apk", "onStart");
+                    }
 
-            @Override
-            public void onProgress(Progress progress) {
-                LogUtil.d("apk","onProgress");
-            }
+                    @Override
+                    public void onProgress(Progress progress) {
+                        LogUtil.d("apk", "onProgress");
+                    }
 
-            @Override
-            public void onError(Progress progress) {
-                LogUtil.d("apk","onError");
-            }
+                    @Override
+                    public void onError(Progress progress) {
+                        LogUtil.d("apk", "onError");
+                    }
 
-            @Override
-            public void onFinish(File file, Progress progress) {
-                LogUtil.d("apk",file.getAbsolutePath());
-                ApkUtils.install(MainActivity.this,file);
-            }
+                    @Override
+                    public void onFinish(File file, Progress progress) {
+                        LogUtil.d("apk", file.getAbsolutePath());
+                        ApkUtils.install(MainActivity.this, file);
+                    }
 
-            @Override
-            public void onRemove(Progress progress) {
-                LogUtil.d("apk","onRemove");
-            }
-        });
+                    @Override
+                    public void onRemove(Progress progress) {
+                        LogUtil.d("apk", "onRemove");
+                    }
+                });
 //        task.start();//开始或者继续下载
 //        task.pause();//暂停下载
 //        task.remove();//删除下载，只删除记录，不删除文件
 //        task.remove(true);//删除下载，同时删除记录和文件
         task.restart();//重新下载
     }
-    public void checkVersion() {
 
+    public void checkVersion() {
+        LogUtil.d("===", "开始检查版本更新");
 //        OkGo.<String>get("http://192.168.10.120:8080/app/uploadVersionInfo")
-        OkGo.<String>get("http://"+SDCardUtils.readTxt(CodeConstants.IP_HOST_APP)+"/app/uploadVersionInfo")
+        OkGo.<String>get("http://" + SDCardUtils.readTxt(CodeConstants.IP_HOST_APP) + "/app/uploadVersionInfo")
                 .execute(new StringCallback() {
                     @Override
                     public void onSuccess(Response<String> response) {
-                        LogUtil.d("===",response.body());
+                        LogUtil.d("===", response.body());
                         try {
                             JSONObject jsonObject = new JSONObject(response.body());
-                            ToastUtils.showToast(MainActivity.this,"收到的更新信息为："+jsonObject.toString());
+                            ToastUtils.showToast(MainActivity.this, "收到的更新信息为：" + jsonObject.toString());
                             versionCodeOnLine = jsonObject.getString("code");
                             appUrl = jsonObject.getString("url");
                             versionCodeLocal = Utils.getVersionCode(MainActivity.this);
-                            if(versionCodeOnLine != null  && appUrl != null){
-                                ToastUtils.showToast(MainActivity.this,"更新的版本号为："+versionCodeOnLine);
-                                if(versionCodeOnLine!=null){
-                                if(Integer.parseInt(versionCodeOnLine) >versionCodeLocal ){
-                                    ToastUtils.showToast(MainActivity.this,"开始更新：");
-                                    loadFile(appUrl);
-
-                                }
+                            if (versionCodeOnLine != null && appUrl != null) {
+                                ToastUtils.showToast(MainActivity.this, "更新的版本号为：" + versionCodeOnLine);
+                                if (versionCodeOnLine != null) {
+                                    if (Integer.parseInt(versionCodeOnLine) > versionCodeLocal) {
+                                        ToastUtils.showToast(MainActivity.this, "开始更新：");
+                                        loadFile(appUrl);
+                                    }
                                 }
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
+
                     @Override
                     public void onError(Response<String> response) {
                         super.onError(response);

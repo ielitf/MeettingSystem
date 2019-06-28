@@ -55,7 +55,6 @@ public class MeetingAdapter extends MyBaseAdapter2<MqttMeetingListBean> {
         MqttMeetingListBean item = data.get(position);
 
         holderView.day.setText(DateTimeUtil.getInstance().transTimeToMMDD(item.getStartDate()));
-
         holderView.hour.setText(DateTimeUtil.getInstance().transTimeToHHMM(item.getStartDate())+"-"+DateTimeUtil.getInstance().transTimeToHHMM(item.getEndDate()));
         if ("1".equals(item.getIsOpen())){
             holderView.title.setText(item.getName());

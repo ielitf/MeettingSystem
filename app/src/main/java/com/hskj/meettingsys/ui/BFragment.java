@@ -27,13 +27,11 @@ import com.hskj.meettingsys.bean.WeatherBean;
 import com.hskj.meettingsys.bean.WeatherData;
 import com.hskj.meettingsys.control.CodeConstants;
 import com.hskj.meettingsys.listener.FragmentCallBackB;
-import com.hskj.meettingsys.listener.OnGetCurrentDateTimeListener;
 import com.hskj.meettingsys.utils.DateTimeUtil;
 import com.hskj.meettingsys.utils.IPAddressUtils;
 import com.hskj.meettingsys.utils.LogUtil;
 import com.hskj.meettingsys.utils.MqttService;
 import com.hskj.meettingsys.utils.SDCardUtils;
-import com.hskj.meettingsys.utils.TimeThread;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
 import org.json.JSONException;
@@ -43,7 +41,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class BFragment extends Fragment implements OnGetCurrentDateTimeListener, FragmentCallBackB{
+public class BFragment extends Fragment implements FragmentCallBackB{
     private GridView gridView;
     private WeatherAdapter weatherAdapter;
     private Context context;
@@ -57,7 +55,6 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
     private MeetingAdapter adapter = null;
     private TextView timeTv, dataTv, roomName, meetingName, meetingTime, meeting_bumen, room_num;
     private DateTimeUtil dateTimeUtil;
-    private TimeThread timeThread;
     private long delayTime = 3000;//listView列表比较多时，自动滚动的时间间隔
     private long weathetUpdataTime = 3600 * 1000;//天气定时更新
     private Timer timer;
@@ -91,14 +88,12 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
                     }
                     break;
                 case 2:
-                    if (myMeetingList.size() > 0) {
                         if (adapter == null) {
                             adapter = new MeetingAdapter(context, myMeetingList);
                             meeting_listView.setAdapter(adapter);
                         } else {
                             adapter.notifyDataSetChanged();
                         }
-                    }
                     break;
                 case 3:
                     loadWeatherData();
@@ -142,8 +137,6 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
         context = getActivity();
         initViews(convertView);
         dateTimeUtil = DateTimeUtil.getInstance();
-        timeThread = new TimeThread(BFragment.this);
-        timeThread.start();
         loadWeatherData();
         MainActivity.setFragmentCallBackB(this);
         listScrollUp();
@@ -165,6 +158,7 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
         });
 //        initData();
 //        initWeatherData()
+        LogUtil.d("===", "模板B准备就绪");
         return convertView;
     }
 
@@ -225,11 +219,9 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
         if (topic.equals(MqttService.TOPIC_MEETING_LIST)) {//今日会议
             myMeetingList.clear();
             myMeetingList.addAll(mList);
-            if (myMeetingList.size() > 0) {
                 Message msg = new Message();
                 msg.what = 2;
                 handler.sendMessage(msg);
-            }
         }
     }
 
@@ -252,12 +244,6 @@ public class BFragment extends Fragment implements OnGetCurrentDateTimeListener,
         }
 //        weatherAdapter = new WeatherAdapter(context,jiaWeatherList);
 //        gridView.setAdapter(weatherAdapter);
-    }
-
-    @Override
-    public void onGetDateTime() {
-        timeTv.setText(dateTimeUtil.getCurrentTime());//显示时间
-        dataTv.setText(dateTimeUtil.getCurrentDateYYMMDD() + "\t" + dateTimeUtil.getCurrentWeekDay(0));//显示年月日
     }
 
     /**

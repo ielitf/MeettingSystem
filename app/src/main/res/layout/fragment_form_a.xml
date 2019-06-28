@@ -217,7 +217,7 @@
                     android:ellipsize="marquee"
                     android:marqueeRepeatLimit="marquee_forever"
                     android:singleLine="true"
-                    android:text="会议室会议室会议室会议室"
+                    android:text="会议室"
                     android:textColor="@color/white"
                     android:textSize="@dimen/a_meeting_room_name" />
 
@@ -253,26 +253,24 @@
                     android:gravity="center"
                     android:orientation="vertical">
 
-                    <com.hskj.meettingsys.utils.MarqueeTextView
+                    <TextClock
                         android:id="@+id/timea"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:ellipsize="marquee"
-                        android:singleLine="true"
+                        android:format24Hour="HH:mm:ss"
                         android:text="11:20:42"
                         android:textColor="@color/white"
                         android:textSize="@dimen/a_meeting_time" />
 
-                    <com.hskj.meettingsys.utils.MarqueeTextView
+                    <TextClock
                         android:id="@+id/dataa"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:gravity="center"
-                        android:ellipsize="marquee"
-                        android:singleLine="true"
-                        android:text="2019/07/24     星期五"
+                        android:format24Hour="yyyy/MM/dd    EE"
+                        android:text="2019/09/20    星期五"
                         android:textColor="@color/white"
                         android:textSize="@dimen/a_meeting_data" />
 

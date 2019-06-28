@@ -24,6 +24,7 @@
         android:layout_height="wrap_content"
         android:text=""
         android:singleLine="true"
+        android:marqueeRepeatLimit="marquee_forever"
         android:ellipsize="marquee"
         android:textSize="@dimen/weather_list_item_text"
         android:textColor="@color/white"

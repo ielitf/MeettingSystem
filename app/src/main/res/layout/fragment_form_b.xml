@@ -45,6 +45,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ellipsize="marquee"
+        android:marqueeRepeatLimit="marquee_forever"
         android:singleLine="true"
         android:background="@color/back_B"
         android:gravity="center"
@@ -207,26 +208,24 @@
                     android:orientation="vertical"
                     >
 
-                    <com.hskj.meettingsys.utils.MarqueeTextView
+                    <TextClock
                         android:id="@+id/timeb"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:ellipsize="marquee"
-                        android:singleLine="true"
                         android:layout_marginTop="@dimen/px30_dp"
                         android:gravity="center"
+                        android:format24Hour="HH:mm:ss"
                         android:text="11:20:42"
                         android:textSize="@dimen/b_meeting_time"
                         android:textColor="@color/white"
                         />
-                    <com.hskj.meettingsys.utils.MarqueeTextView
+                    <TextClock
                         android:id="@+id/datab"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:ellipsize="marquee"
-                        android:singleLine="true"
                         android:layout_marginTop="@dimen/px15_dp"
                         android:gravity="center"
+                        android:format24Hour="yyyy/MM/dd    EE"
                         android:text="2019/07/24     星期五"
                         android:textSize="@dimen/b_meeting_data"
                         android:textColor="@color/white"

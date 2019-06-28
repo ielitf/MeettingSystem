@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:visibility="gone">
+        android:visibility="visible">
 
         <TextView
             android:id="@+id/cur_news"
@@ -44,7 +44,8 @@
             android:layout_height="30dp"
             android:layout_marginLeft="10dp"
             android:gravity="center"
-            android:text="当前" />
+            android:textColor="#0000ff"
+            android:text="查询" />
 
         <TextView
             android:id="@+id/today"
@@ -52,7 +53,9 @@
             android:layout_height="30dp"
             android:layout_marginLeft="10dp"
             android:gravity="center"
-            android:text="今日" />
+            android:textColor="#ff00ff"
+            android:text="添加" />
+
         <TextView
             android:id="@+id/download"
             android:layout_width="wrap_content"

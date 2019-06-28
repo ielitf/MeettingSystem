@@ -1,5 +1,6 @@
 package com.hskj.meettingsys.utils;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -19,6 +20,17 @@ public class DateTimeUtil {
         return instance;
     }
 
+    //将日期转化为毫秒数
+    public long transDataToTime(String data) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        long time  = 0;
+        try {
+            time = formatter.parse(data).getTime();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return time;
+    }
     //将时间毫秒数转换为：时分
     public String transTimeToHHMM(long time) {
         SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
@@ -29,6 +41,13 @@ public class DateTimeUtil {
     //将时间毫秒数转换为：月日
     public String transTimeToMMDD(long time) {
         SimpleDateFormat formatter = new SimpleDateFormat("MM-dd");
+        Date date = new Date(time);
+        String curDate = formatter.format(date);
+        return curDate;
+    }
+    //将时间毫秒数转换为：年月日
+    public String transTimeToYYMMDD(long time) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         Date date = new Date(time);
         String curDate = formatter.format(date);
         return curDate;

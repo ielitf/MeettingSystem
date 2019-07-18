@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <dimen name="a_meeting_room_name">35sp</dimen>
+    <dimen name="a_meeting_room_name">32sp</dimen>
     <dimen name="a_meeting_cur_name">35sp</dimen>
     <dimen name="a_meeting_cur_time">25sp</dimen>
     <dimen name="a_meeting_cur_bumen">25sp</dimen>
@@ -16,7 +16,7 @@
     <dimen name="weather_list_divide">16dp</dimen>
 
 
-    <dimen name="b_meeting_room_name">40sp</dimen>
+    <dimen name="b_meeting_room_name">36sp</dimen>
     <dimen name="b_meeting_cur_name">35sp</dimen>
     <dimen name="b_meeting_cur_time">25sp</dimen>
     <dimen name="b_meeting_cur_bumen">25sp</dimen>

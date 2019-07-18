@@ -23,7 +23,7 @@ public class MeetingAdapter extends MyBaseAdapter2<MqttMeetingListBean> {
     @Override
     public int getCount() {
         // TODO Auto-generated method stub
-        return data.size();
+        return data == null ? 0: data.size();
     }
 
     @Override

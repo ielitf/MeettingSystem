@@ -4,7 +4,6 @@ package com.hskj.meettingsys.K780;
  * K780数据操作类
  */
 public class K780Utils {
-
 	public static final String host = "http://api.k780.com/?app=weather.today";
 	public static final String weaid = "1";
 	public static final String APPKEY = "42583";

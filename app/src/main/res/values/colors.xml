@@ -20,6 +20,9 @@
 
     <color name="transparent">#00000000</color>
     <color name="transparent1">#22000000</color>
-    <drawable name="lightgreen">#7cd12e</drawable>
+    <color name="lightgreen">#7cd12e</color>
+
+    <color name="my_orange">#FF9800</color>
+    <color name="my_blue">#1236CB</color>
 
 </resources>

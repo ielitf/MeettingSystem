@@ -54,7 +54,6 @@ public class IPAddressUtils {
                             .getSystemService(Context.WIFI_SERVICE);
                     WifiInfo wifiInfo = wifiManager.getConnectionInfo();
                     int i = wifiInfo.getIpAddress();
-                    System.out.println("dddd=======" + i);
                     IP = int2ip(i);
                     return IP;
                 } catch (Exception ex) {

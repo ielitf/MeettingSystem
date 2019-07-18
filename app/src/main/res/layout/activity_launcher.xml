@@ -14,7 +14,7 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:text="欢 迎 使 用"
-        android:textColor="@drawable/lightgreen"
+        android:textColor="@color/lightgreen"
         android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -28,7 +28,7 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:orientation="horizontal"
-        android:background="@drawable/lightgreen"
+        android:background="@color/lightgreen"
         android:visibility="invisible"
         >
 

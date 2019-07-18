@@ -7,11 +7,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.hskj.meettingsys.R;
-import com.hskj.meettingsys.bean.JiaWeatherBean;
 import com.hskj.meettingsys.bean.WeatherBean;
-import com.hskj.meettingsys.utils.GlideHelper;
 
 import java.util.List;
 
@@ -27,7 +24,12 @@ public class WeatherAdapter extends MyBaseAdapter2<WeatherBean> {
     @Override
     public int getCount() {
         // TODO Auto-generated method stub
-        return 3;
+        if(data == null){
+            return 0;
+        }else if(data.size() < 3){
+            return data.size();
+        }else
+            return 3;
     }
 
     @Override
@@ -72,6 +74,84 @@ public class WeatherAdapter extends MyBaseAdapter2<WeatherBean> {
         }
         holderView.tem_h.setText(item.getWeather());
         holderView.tem_l.setText(item.getTemperature());
+
+        String weather=item.getWeather();
+
+
+        if((weather.indexOf("雷阵雨"))!=-1){
+            holderView.wea.setImageResource(R.mipmap.leizhenyu);
+        }
+        if((weather.indexOf("暴雨"))!=-1){
+            holderView.wea.setImageResource(R.mipmap.baoyu);
+        }
+        if((weather.indexOf("小雨"))!=-1){
+            holderView.wea.setImageResource(R.mipmap.xiaoyu);
+        }
+        if((weather.indexOf("中雨"))!=-1){
+            holderView.wea.setImageResource(R.mipmap.zhongyu);
+        }
+        if((weather.indexOf("大雨"))!=-1){
+            holderView.wea.setImageResource(R.mipmap.dayu);
+        }
+        if((weather.indexOf("阵雨"))!=-1){
+            holderView.wea.setImageResource(R.mipmap.dayu);
+        }
+        if((weather.indexOf("转晴"))!=-1){
+            holderView.wea.setImageResource(R.mipmap.sunny);
+        }
+        if((weather.indexOf("转雾"))!=-1){
+            holderView.wea.setImageResource(R.mipmap.wu);
+        }
+        if((weather.indexOf("雨夹雪"))!=-1){
+            holderView.wea.setImageResource(R.mipmap.yujiaxue);
+        }
+        if((weather.indexOf("小雪"))!=-1){
+            holderView.wea.setImageResource(R.mipmap.xiaoxue);
+        }
+        if((weather.indexOf("中雪"))!=-1){
+            holderView.wea.setImageResource(R.mipmap.zhongxue);
+        }
+        if((weather.indexOf("大雪"))!=-1){
+            holderView.wea.setImageResource(R.mipmap.daxue);
+        }
+
+        if(weather.equals("晴转多云")){
+            holderView.wea.setImageResource(R.mipmap.sunntclude);
+        }else if(weather.equals("晴")){
+            holderView.wea.setImageResource(R.mipmap.sunny);
+        }else if(weather.equals("阴")){
+            holderView.wea.setImageResource(R.mipmap.yin);
+        }else if(weather.equals("多云")){
+            holderView.wea.setImageResource(R.mipmap.yin);
+        }else if(weather.equals("小雪")){
+            holderView.wea.setImageResource(R.mipmap.xiaoxue);
+        }else if(weather.equals("中雪")){
+            holderView.wea.setImageResource(R.mipmap.zhongxue);
+        }else if(weather.equals("大雪")){
+            holderView.wea.setImageResource(R.mipmap.daxue);
+        }else if(weather.equals("雾")){
+            holderView.wea.setImageResource(R.mipmap.wu);
+        }else if(weather.equals("扬沙")){
+            holderView.wea.setImageResource(R.mipmap.yangsha);
+        }else if(weather.equals("小雨")){
+            holderView.wea.setImageResource(R.mipmap.xiaoyu);
+        }else if(weather.equals("中雨")){
+            holderView.wea.setImageResource(R.mipmap.zhongyu);
+        }else if(weather.equals("大雨")){
+            holderView.wea.setImageResource(R.mipmap.dayu);
+        }else if(weather.equals("暴雨")){
+            holderView.wea.setImageResource(R.mipmap.baoyu);
+        }else if(weather.equals("雨夹雪")){
+            holderView.wea.setImageResource(R.mipmap.yujiaxue);
+        }else if(weather.equals("沙尘暴")){
+            holderView.wea.setImageResource(R.mipmap.shachenbao);
+        }else if(weather.equals("雷阵雨")){
+            holderView.wea.setImageResource(R.mipmap.leizhenyu);
+        } else if(weather.equals("多云转晴")){
+            holderView.wea.setImageResource(R.mipmap.sunntclude);
+        }
+
+
 
         return convertView;
     }

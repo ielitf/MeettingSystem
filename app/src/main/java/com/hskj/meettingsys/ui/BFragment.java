@@ -12,6 +12,7 @@ import android.widget.AbsListView;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
+
 import com.alibaba.fastjson.JSON;
 import com.hskj.meettingsys.K780.K780Utils;
 import com.hskj.meettingsys.R;
@@ -25,23 +26,30 @@ import com.hskj.meettingsys.bean.MqttMeetingCurrentBean;
 import com.hskj.meettingsys.bean.MqttMeetingListBean;
 import com.hskj.meettingsys.bean.WeatherBean;
 import com.hskj.meettingsys.bean.WeatherData;
-import com.hskj.meettingsys.control.CodeConstants;
+import com.hskj.meettingsys.greendao.DaoMaster;
+import com.hskj.meettingsys.greendao.DaoSession;
+import com.hskj.meettingsys.greendao.MqttMeetingListBeanDao;
+import com.hskj.meettingsys.listener.DataBaseQueryListenerA;
+import com.hskj.meettingsys.listener.DataBaseQueryListenerB;
 import com.hskj.meettingsys.listener.FragmentCallBackB;
 import com.hskj.meettingsys.utils.DateTimeUtil;
 import com.hskj.meettingsys.utils.IPAddressUtils;
 import com.hskj.meettingsys.utils.LogUtil;
 import com.hskj.meettingsys.utils.MqttService;
-import com.hskj.meettingsys.utils.SDCardUtils;
+import com.hskj.meettingsys.utils.SharedPreferenceTools;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class BFragment extends Fragment implements FragmentCallBackB{
+public class BFragment extends Fragment implements FragmentCallBackB , DataBaseQueryListenerB {
+    private List<MqttMeetingListBean> meetingListQuery;
     private GridView gridView;
     private WeatherAdapter weatherAdapter;
     private Context context;
@@ -57,10 +65,18 @@ public class BFragment extends Fragment implements FragmentCallBackB{
     private DateTimeUtil dateTimeUtil;
     private long delayTime = 3000;//listView列表比较多时，自动滚动的时间间隔
     private long weathetUpdataTime = 3600 * 1000;//天气定时更新
-    private Timer timer;
-    private MyWeatherTask task;
+    private Timer checkWeaherTimer,checkCurMeetingTime;
+    private CheckCurMeetingTask checkCurMeetingTask;
+    private static long durationTime;//当前会议持续时间
+    private MyWeatherTask checkWeatherTask;
+    private DaoMaster daoMaster;
+    private DaoSession daoSession;
+    private MqttMeetingListBeanDao meetingListBeanDao;
     private String ip;
+    private float f_density;
+    private int int_density;
     private static String JsonStringCurMeet;
+    private static String roomNum;//会议室编号
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -80,6 +96,19 @@ public class BFragment extends Fragment implements FragmentCallBackB{
                             meetingName.setText("未公开");
                             meeting_bumen.setText("");
                         }
+                        if (checkCurMeetingTask != null) {
+                            checkCurMeetingTask.cancel();
+                            checkCurMeetingTask = null;
+                        }
+                        if (checkCurMeetingTime != null) {
+                            checkCurMeetingTime.purge();
+                            checkCurMeetingTime.cancel();
+                            checkCurMeetingTime = null;
+                        }
+                        checkCurMeetingTime = new Timer();
+                        checkCurMeetingTask = new CheckCurMeetingTask();
+                        checkCurMeetingTime.schedule(checkCurMeetingTask,durationTime);//在会议结束后，显示当前无会议
+
                     } else {
                         roomName.setText("会议室");
                         meetingName.setText("当前无会议");
@@ -88,15 +117,17 @@ public class BFragment extends Fragment implements FragmentCallBackB{
                     }
                     break;
                 case 2:
-                        if (adapter == null) {
-                            adapter = new MeetingAdapter(context, myMeetingList);
-                            meeting_listView.setAdapter(adapter);
-                        } else {
-                            adapter.notifyDataSetChanged();
-                        }
+                    if (adapter == null) {
+                        adapter = new MeetingAdapter(context, myMeetingList);
+                        meeting_listView.setAdapter(adapter);
+                    } else {
+                        adapter.notifyDataSetChanged();
+                    }
                     break;
                 case 3:
-                    loadWeatherData();
+                    meetingName.setText("当前无会议");
+                    meetingTime.setText("");
+                    meeting_bumen.setText("");
                     break;
                 default:
                     break;
@@ -106,7 +137,7 @@ public class BFragment extends Fragment implements FragmentCallBackB{
     private Runnable run_scroll_up = new Runnable() {
         @Override
         public void run() {
-            meeting_listView.smoothScrollBy(30, 1000);
+            meeting_listView.smoothScrollBy(int_density, 1000);
             handler.postDelayed(run_scroll_up, delayTime);
         }
     };
@@ -135,9 +166,19 @@ public class BFragment extends Fragment implements FragmentCallBackB{
                              Bundle savedInstanceState) {
         View convertView = inflater.inflate(R.layout.fragment_form_b, container, false);
         context = getActivity();
+        f_density = context.getResources().getDisplayMetrics().density;
+        int_density = (int) (f_density * 40);
         initViews(convertView);
+        getStuDao();
+        meetingListQuery = new ArrayList<MqttMeetingListBean>();
         dateTimeUtil = DateTimeUtil.getInstance();
-        loadWeatherData();
+
+        //下载天气数据，并且1小时更新一次
+//        loadWeatherData();
+//        checkWeaherTimer = new Timer();
+//        checkWeatherTask = new MyWeatherTask();
+//        checkWeaherTimer.schedule(checkWeatherTask,0, 1 * 3600 * 1000);
+        CustomEidtDialog.setOnDataBaseQueryListenerB(this);
         MainActivity.setFragmentCallBackB(this);
         listScrollUp();
         meeting_listView.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -159,13 +200,35 @@ public class BFragment extends Fragment implements FragmentCallBackB{
 //        initData();
 //        initWeatherData()
         LogUtil.d("===", "模板B准备就绪");
+        inintData();//从数据库中查询今日会议数据
         return convertView;
     }
 
+    /**
+     * 从数据库中查询今日会议数据
+     */
+    private void inintData() {
+        roomNum= (String) SharedPreferenceTools.getValueofSP(context,"DeviceNum","");//获取会议室编号
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                meetingListQuery.clear();
+                meetingListQuery.addAll(meetingListBeanDao.queryBuilder().where(MqttMeetingListBeanDao.Properties.RoomNum.eq(roomNum),MqttMeetingListBeanDao.Properties.StartDate
+                        .between(dateTimeUtil.transDataToTime(dateTimeUtil.getCurrentDateYYMMDD() + " 00:00:00"), dateTimeUtil.transDataToTime(dateTimeUtil.getCurrentDateYYMMDD() + " 23:59:59")))
+                        .orderAsc(MqttMeetingListBeanDao.Properties.EndDate)
+                        .build().list());
+                if (meetingListQuery.size() >= 0) {
+                    TransDataB(MqttService.TOPIC_MEETING_LIST, meetingListQuery);
+                }
+                //更新天气
+                loadWeatherData();
+            }
+        }, 60, 60 * 1000 * 60 * 2);
+    }
+
     private void loadWeatherData() {
-        timingAgain();
         ip = IPAddressUtils.getAndroidIp(context);
-        LogUtil.i("===", ip);
+        LogUtil.i("===设备IP：", ip);
         OkGo.<String>get("http://api.k780.com:88/?")
                 .params("app", "weather.future")
                 .params("weaid", ip)
@@ -183,8 +246,12 @@ public class BFragment extends Fragment implements FragmentCallBackB{
                                 String content = jsonObject.getString("result");
                                 weatherList.clear();
                                 weatherList.addAll(JSON.parseArray(content, WeatherBean.class));
-                                weatherAdapter = new WeatherAdapter(context, weatherList);
-                                gridView.setAdapter(weatherAdapter);
+                                if(weatherAdapter == null){
+                                    weatherAdapter = new WeatherAdapter(context, weatherList);
+                                    gridView.setAdapter(weatherAdapter);
+                                }else{
+                                    weatherAdapter.notifyDataSetChanged();
+                                }
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -204,30 +271,64 @@ public class BFragment extends Fragment implements FragmentCallBackB{
         meeting_listView.setAdapter(jiaAdapter);
     }
 
+    /**
+     * 当切换会议室编号后，通知系统重新查询数据库，并更新页面
+     * @param roomNum
+     */
+    @Override
+    public void onDataBaseQueryListenerB(String roomNum) {
+        room_num.setText("当前会议室编号：" + roomNum);
+        //设置当前会议
+        if (checkCurMeetingTask != null) {
+            checkCurMeetingTask.cancel();
+            checkCurMeetingTask = null;
+        }
+        if (checkCurMeetingTime != null) {
+            checkCurMeetingTime.purge();
+            checkCurMeetingTime.cancel();
+            checkCurMeetingTime = null;
+        }
+        checkCurMeetingTime = new Timer();
+        checkCurMeetingTask = new CheckCurMeetingTask();
+        checkCurMeetingTime.schedule(checkCurMeetingTask, 0);//在会议结束后，显示当前无会议
+
+        //查询今日会议
+        meetingListQuery.clear();
+        meetingListQuery.addAll(meetingListBeanDao.queryBuilder().where(MqttMeetingListBeanDao.Properties.RoomNum.eq(roomNum),MqttMeetingListBeanDao.Properties.StartDate
+                .between(dateTimeUtil.transDataToTime(dateTimeUtil.getCurrentDateYYMMDD() + " 00:00:00"), dateTimeUtil.transDataToTime(dateTimeUtil.getCurrentDateYYMMDD() + " 23:59:59")))
+                .orderAsc(MqttMeetingListBeanDao.Properties.EndDate)
+                .build().list());
+        TransDataB(MqttService.TOPIC_MEETING_LIST, meetingListQuery);
+    }
+    /**
+     * 收到信息
+     */
     @Override
     public void TransDataB(String topic, List mList) {
         LogUtil.w("========BFragment", "topic:" + topic + ";----mList:" + mList.toString());
-        if (topic.equals(MqttService.TOPIC_MEETING_CUR)) {//当前会议
+        if (topic.equals(MqttService.TOPIC_MEETING_CUR)) { //当前会议
             myCurMeetingList.clear();
             myCurMeetingList.addAll(mList);
             if (myCurMeetingList.size() > 0) {
+                durationTime = myCurMeetingList.get(0).getEndDate() - System.currentTimeMillis();
                 Message msg = new Message();
                 msg.what = 1;
                 handler.sendMessage(msg);
             }
         }
-        if (topic.equals(MqttService.TOPIC_MEETING_LIST)) {//今日会议
+        if (topic.equals(MqttService.TOPIC_MEETING_LIST)) { //今日会议
             myMeetingList.clear();
             myMeetingList.addAll(mList);
-                Message msg = new Message();
-                msg.what = 2;
-                handler.sendMessage(msg);
+            Message msg = new Message();
+            msg.what = 2;
+            handler.sendMessage(msg);
         }
     }
 
     private void initViews(View view) {
         room_num = view.findViewById(R.id.room_num);
-        room_num.setText("当前会议室编号：" + SDCardUtils.readTxt(CodeConstants.ROOM_NUMBER));
+        String DeviceNum = (String) SharedPreferenceTools.getValueofSP(getActivity(), "DeviceNum", "");
+        room_num.setText("当前会议室编号：" + DeviceNum);
         meeting_listView = view.findViewById(R.id.meeting_listb);
         timeTv = view.findViewById(R.id.timeb);
         dataTv = view.findViewById(R.id.datab);
@@ -247,49 +348,59 @@ public class BFragment extends Fragment implements FragmentCallBackB{
     }
 
     /**
-     * 定时更新天气，暂定1小时更新一次
+     * 当前会议：会议结束后，若当前无会议，，显示无会议
      */
-    class MyWeatherTask extends TimerTask {
+    class CheckCurMeetingTask extends TimerTask {
 
         @Override
         public void run() {
             Message msg = new Message();
             msg.what = 3;
             handler.sendMessage(msg);
+
         }
     }
-
     /**
      * 定时更新天气，暂定1小时更新一次
      */
-    public void timingAgain() {
-        if (task != null) {
-            task.cancel();
-            task = null;
-        }
-        if (timer != null) {
-            timer.purge();
-            timer.cancel();
-            timer = null;
-        }
-        timer = new Timer();
-        task = new MyWeatherTask();
-        timer.schedule(task, weathetUpdataTime);
-        LogUtil.i("===", "重新计时");
+    class MyWeatherTask extends TimerTask {
 
+        @Override
+        public void run() {
+            loadWeatherData();
+        }
     }
+
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (task != null) {
-            task.cancel();
-            task = null;
+        if (checkWeatherTask != null) {
+            checkWeatherTask.cancel();
+            checkWeatherTask = null;
         }
-        if (timer != null) {
-            timer.purge();
-            timer.cancel();
-            timer = null;
+        if (checkWeaherTimer != null) {
+            checkWeaherTimer.purge();
+            checkWeaherTimer.cancel();
+            checkWeaherTimer = null;
         }
+        if (checkCurMeetingTask != null) {
+            checkCurMeetingTask.cancel();
+            checkCurMeetingTask = null;
+        }
+        if (checkCurMeetingTime != null) {
+            checkCurMeetingTime.purge();
+            checkCurMeetingTime.cancel();
+            checkCurMeetingTime = null;
+        }
+    }
+
+    private void getStuDao() {
+        // 创建数据
+        DaoMaster.DevOpenHelper devOpenHelper = new DaoMaster.DevOpenHelper(getActivity(), "meetingList.db", null);
+        daoMaster = new DaoMaster(devOpenHelper.getWritableDb());
+        daoSession = daoMaster.newSession();
+        meetingListBeanDao = daoSession.getMqttMeetingListBeanDao();
+
     }
 }

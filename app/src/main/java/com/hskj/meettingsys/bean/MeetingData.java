@@ -1,6 +1,7 @@
 package com.hskj.meettingsys.bean;
 
-public class MeetingData {
+public class
+MeetingData {
     public static String[] meeting_data_day = new String[]{
             "6 - 15","6 - 15","6 - 15","6 - 15", "6 - 15",
             "6 - 15","6 - 15", "6 - 15","6 - 15","6 - 15","6 - 15", "6 - 15",

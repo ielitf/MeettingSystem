@@ -112,7 +112,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
         saveCrashInfo2File(ex);
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        ComponentName cn = new ComponentName("xinshuyuan.xinshuyuan.com.xinshuyuanclassinfoshowsystem", "xinshuyuan.com.wrongtitlebook.Welcome.view.activity.WelcomeAcitivty");
+        ComponentName cn = new ComponentName("com.hskj.meettingsys", "com.hskj.meettingsys.MainActivity");
         intent.setComponent(cn);
         mContext.startActivity(intent);
 

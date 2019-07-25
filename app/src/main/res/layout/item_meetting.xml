@@ -16,7 +16,7 @@
     android:layout_weight="1"
     android:text="10:01 - 11:11"
     />
-<TextView
+<com.hskj.meettingsys.utils.MarqueeTextView
     android:id="@+id/meeting_title"
     style="@style/meeting_item"
     android:layout_weight="2"

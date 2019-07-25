@@ -112,8 +112,6 @@ public class IPAddressUtils {
                 }
                 return IP;
             }
-        }else {
-            Toast.makeText(context,"哎呀，网络开小差了，请检查网络设置",Toast.LENGTH_SHORT).show();
         }
         return "";
     }

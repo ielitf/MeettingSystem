@@ -77,7 +77,9 @@ public class WeatherAdapter extends MyBaseAdapter2<WeatherBean> {
 
         String weather=item.getWeather();
 
-
+        if((weather.indexOf("阵雨"))!=-1){
+            holderView.wea.setImageResource(R.mipmap.dayu);
+        }
         if((weather.indexOf("雷阵雨"))!=-1){
             holderView.wea.setImageResource(R.mipmap.leizhenyu);
         }
@@ -91,9 +93,6 @@ public class WeatherAdapter extends MyBaseAdapter2<WeatherBean> {
             holderView.wea.setImageResource(R.mipmap.zhongyu);
         }
         if((weather.indexOf("大雨"))!=-1){
-            holderView.wea.setImageResource(R.mipmap.dayu);
-        }
-        if((weather.indexOf("阵雨"))!=-1){
             holderView.wea.setImageResource(R.mipmap.dayu);
         }
         if((weather.indexOf("转晴"))!=-1){
@@ -122,7 +121,7 @@ public class WeatherAdapter extends MyBaseAdapter2<WeatherBean> {
         }else if(weather.equals("阴")){
             holderView.wea.setImageResource(R.mipmap.yin);
         }else if(weather.equals("多云")){
-            holderView.wea.setImageResource(R.mipmap.yin);
+            holderView.wea.setImageResource(R.mipmap.sunntclude);
         }else if(weather.equals("小雪")){
             holderView.wea.setImageResource(R.mipmap.xiaoxue);
         }else if(weather.equals("中雪")){

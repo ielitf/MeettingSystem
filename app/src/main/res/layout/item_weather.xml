@@ -8,7 +8,7 @@
         android:id="@+id/weather_wea"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:src="@mipmap/sunny"/>
+        android:src="@mipmap/sunntclude"/>
 <TextView
     android:id="@+id/weather_day"
     android:layout_width="wrap_content"

@@ -218,7 +218,12 @@ public class AFragment extends Fragment implements FragmentCallBackA , DataBaseQ
                         .orderAsc(MqttMeetingListBeanDao.Properties.EndDate)
                         .build().list());
                 if (meetingListQuery.size() >= 0) {
-                    TransDataA(MqttService.TOPIC_MEETING_LIST, meetingListQuery);
+//                    TransDataA(MqttService.TOPIC_MEETING_LIST, meetingListQuery);
+                    myMeetingList.clear();
+                    myMeetingList.addAll(meetingListQuery);
+                    Message msg = new Message();
+                    msg.what = 2;
+                    handler.sendMessage(msg);
                 }
                 //更新天气
                 loadWeatherData();
@@ -309,6 +314,9 @@ public class AFragment extends Fragment implements FragmentCallBackA , DataBaseQ
             myCurMeetingList.addAll(mList);
             if (myCurMeetingList.size() > 0) {
                 durationTime = myCurMeetingList.get(0).getEndDate() - System.currentTimeMillis();
+                if(durationTime<0){
+                    durationTime = 0;
+                }
                 Message msg = new Message();
                 msg.what = 1;
                 handler.sendMessage(msg);

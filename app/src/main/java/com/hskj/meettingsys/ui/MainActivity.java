@@ -194,15 +194,6 @@ public class MainActivity extends AppCompatActivity implements CurMeetingCallBac
             templateId = meetingListReceive.get(0).getTemplateId();
             SharePreferenceManager.setMeetingMuBanType(templateId);//将模板类型存到本地缓存中
             roomNum = (String) SharedPreferenceTools.getValueofSP(this, "DeviceNum", "");//获取会议室编号
-            Message msg = new Message();
-            if (templateId == 1) {//模板
-//                viewPager.setCurrentItem(0);
-                msg.what = 0x1;
-            } else {//模板
-//                viewPager.setCurrentItem(1);
-                msg.what = 0x2;
-            }
-            handler.sendMessage(msg);
 
             switch (meetingListReceive.get(0).getSign()) {
                 case "insert":
@@ -245,6 +236,16 @@ public class MainActivity extends AppCompatActivity implements CurMeetingCallBac
                     .build().list());
             fragmentCallBackA.TransDataA(topic, meetingListQuery);
             fragmentCallBackB.TransDataB(topic, meetingListQuery);
+
+            Message msg = new Message();
+            if (templateId == 1) {//模板
+//                viewPager.setCurrentItem(0);
+                msg.what = 0x1;
+            } else {//模板
+//                viewPager.setCurrentItem(1);
+                msg.what = 0x2;
+            }
+            handler.sendMessage(msg);
         }
     }
 
@@ -421,6 +422,8 @@ public class MainActivity extends AppCompatActivity implements CurMeetingCallBac
     }
 
     public void checkVersion() {
+        versionCodeLocal = Utils.getVersionCode(MainActivity.this);
+        ToastUtils.showToast(MainActivity.this, "当前版本：" + versionCodeLocal);
         LogUtil.d("===", "开始检查版本更新");
 //        OkGo.<String>get("http://192.168.10.120:8080/app/uploadVersionInfo")
         OkGo.<String>get(RequestApi.getUpdataAppUrl())
@@ -430,7 +433,6 @@ public class MainActivity extends AppCompatActivity implements CurMeetingCallBac
                         LogUtil.d("===", response.body());
                         try {
                             JSONObject jsonObject = new JSONObject(response.body());
-                            ToastUtils.showToast(MainActivity.this, "收到的更新信息为：" + jsonObject.toString());
                             versionCodeOnLine = jsonObject.getString("code");
                             appUrl = jsonObject.getString("url");
                             String downUrl = (String) SharedPreferenceTools.getValueofSP(MainActivity.this, "ServiceIp", "");
@@ -440,12 +442,11 @@ public class MainActivity extends AppCompatActivity implements CurMeetingCallBac
                             } else {
                                 appUrl = downUrl + appUrl;
                             }
-                            versionCodeLocal = Utils.getVersionCode(MainActivity.this);
                             if (versionCodeOnLine != null && appUrl != null) {
-                                ToastUtils.showToast(MainActivity.this, "更新的版本号为：" + versionCodeOnLine);
                                 if (versionCodeOnLine != null) {
                                     if (Integer.parseInt(versionCodeOnLine) > versionCodeLocal) {
-                                        ToastUtils.showToast(MainActivity.this, "开始更新：");
+                                        ToastUtils.showToast(MainActivity.this, "发现新版本：" + versionCodeOnLine);
+                                        ToastUtils.showToast(MainActivity.this, "开始自动更新...");
                                         loadFile(appUrl);
                                     }
                                 }

@@ -24,6 +24,7 @@ import com.hskj.meettingsys.bean.MeetingItemBean;
 import com.hskj.meettingsys.bean.MqttMeetingCurrentBean;
 import com.hskj.meettingsys.bean.MqttMeetingListBean;
 import com.hskj.meettingsys.bean.WeatherBean;
+import com.hskj.meettingsys.control.CodeConstants;
 import com.hskj.meettingsys.greendao.DaoMaster;
 import com.hskj.meettingsys.greendao.DaoSession;
 import com.hskj.meettingsys.greendao.MqttMeetingListBeanDao;
@@ -115,6 +116,7 @@ public class AFragment extends Fragment implements FragmentCallBackA , DataBaseQ
                     }
                     break;
                 case 2:
+                    roomName.setText((CharSequence) SharedPreferenceTools.getValueofSP(context, CodeConstants.MEETING_ROOM_NAME,"会议室"));
                     if (adapter == null) {
                         adapter = new MeetingAdapter(context, myMeetingList);
                         meeting_listView.setAdapter(adapter);
@@ -339,6 +341,7 @@ public class AFragment extends Fragment implements FragmentCallBackA , DataBaseQ
         timeTv = view.findViewById(R.id.timea);
         dataTv = view.findViewById(R.id.dataa);
         roomName = view.findViewById(R.id.current_room_name_a);
+        roomName.setText((CharSequence) SharedPreferenceTools.getValueofSP(context, CodeConstants.MEETING_ROOM_NAME,"会议室"));
         meetingName = view.findViewById(R.id.current_meeting_name_a);
         meetingTime = view.findViewById(R.id.current_meeting_time_a);
         meeting_bumen = view.findViewById(R.id.current_meeting_bm_a);

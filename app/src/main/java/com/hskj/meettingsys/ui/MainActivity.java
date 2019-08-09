@@ -26,6 +26,7 @@ import com.hskj.meettingsys.R;
 import com.hskj.meettingsys.adapter.MeetingAdapter;
 import com.hskj.meettingsys.bean.MqttMeetingCurrentBean;
 import com.hskj.meettingsys.bean.MqttMeetingListBean;
+import com.hskj.meettingsys.control.CodeConstants;
 import com.hskj.meettingsys.greendao.DaoMaster;
 import com.hskj.meettingsys.greendao.DaoSession;
 import com.hskj.meettingsys.greendao.MqttMeetingListBeanDao;
@@ -72,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements CurMeetingCallBac
     private List<MqttMeetingListBean> meetingListReceive = new ArrayList<>();
     private List<MqttMeetingCurrentBean> curMeeting = new ArrayList<>();
     private MeetingAdapter adapter = null;
-    private static String versionCodeOnLine, appUrl;
+    private static String versionCodeOnLine, appUrl,meetingRoomName;
     private int versionCodeLocal;
     private Intent intent;
     private DateTimeUtil dateTimeUtil;
@@ -192,6 +193,8 @@ public class MainActivity extends AppCompatActivity implements CurMeetingCallBac
             meetingListReceive.addAll(JSON.parseArray(strMessage, MqttMeetingListBean.class));
             LogUtil.w("===meetingList", "topic:" + topic + ";----meetingList:" + meetingListReceive.toString());
             templateId = meetingListReceive.get(0).getTemplateId();
+            meetingRoomName = meetingListReceive.get(0).getRoomName();
+            SharedPreferenceTools.putValuetoSP(this, CodeConstants.MEETING_ROOM_NAME,meetingRoomName);
             SharePreferenceManager.setMeetingMuBanType(templateId);//将模板类型存到本地缓存中
             roomNum = (String) SharedPreferenceTools.getValueofSP(this, "DeviceNum", "");//获取会议室编号
 

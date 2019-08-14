@@ -33,11 +33,13 @@ import com.hskj.meettingsys.greendao.MqttMeetingListBeanDao;
 import com.hskj.meettingsys.listener.CurMeetingCallBack;
 import com.hskj.meettingsys.listener.FragmentCallBackA;
 import com.hskj.meettingsys.listener.FragmentCallBackB;
+import com.hskj.meettingsys.listener.NetEvevtListener;
 import com.hskj.meettingsys.listener.TodayMeetingCallBack;
 import com.hskj.meettingsys.utils.ApkUtils;
 import com.hskj.meettingsys.utils.DateTimeUtil;
 import com.hskj.meettingsys.utils.LogUtil;
 import com.hskj.meettingsys.utils.MqttService;
+import com.hskj.meettingsys.utils.NetUtil;
 import com.hskj.meettingsys.utils.RequestApi;
 import com.hskj.meettingsys.utils.SDCardUtils;
 import com.hskj.meettingsys.utils.SharePreferenceManager;
@@ -57,8 +59,11 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity implements CurMeetingCallBack, TodayMeetingCallBack, View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements CurMeetingCallBack, TodayMeetingCallBack, View.OnClickListener ,NetEvevtListener{
+    protected String TAG = getClass().getSimpleName();
     private static FragmentCallBackA fragmentCallBackA;
     private static FragmentCallBackB fragmentCallBackB;
     private List<Fragment> frags = new ArrayList<>();
@@ -82,6 +87,10 @@ public class MainActivity extends AppCompatActivity implements CurMeetingCallBac
     private DaoSession daoSession;
     private MqttMeetingListBeanDao meetingListBeanDao;
     private MqttMeetingListBean mqttMeetingListBean;
+    public static NetEvevtListener netEvevtListener;
+    private Timer checkNetTimer;
+    private CheckNetTask checkNetTask;
+    private long periodTime = 1000*5;
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -92,6 +101,9 @@ public class MainActivity extends AppCompatActivity implements CurMeetingCallBac
                     break;
                 case 0x2:
                     viewPager.setCurrentItem(1);
+                    break;
+                case 0x3:
+                    ToastUtils.showToast(MainActivity.this,"网络连接不可用，前检查网络配置");
                     break;
             }
         }
@@ -106,6 +118,7 @@ public class MainActivity extends AppCompatActivity implements CurMeetingCallBac
         // 去除标题栏
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
+        netEvevtListener = this;
         dateTimeUtil = DateTimeUtil.getInstance();
         templateId = SharePreferenceManager.getMeetingMuBanType();//获取存储的磨板类型，默认值：“1”
         getStuDao();
@@ -191,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements CurMeetingCallBac
         if (!"".equals(strMessage) && !"[]".equals(strMessage) && strMessage != null && !TextUtils.isEmpty(strMessage)) {
             meetingListReceive.clear();
             meetingListReceive.addAll(JSON.parseArray(strMessage, MqttMeetingListBean.class));
-            LogUtil.w("===meetingList", "topic:" + topic + ";----meetingList:" + meetingListReceive.toString());
+            LogUtil.w("===meetingList", "topic:" + topic + ";----meetingListReceive:" + meetingListReceive.toString());
             templateId = meetingListReceive.get(0).getTemplateId();
             meetingRoomName = meetingListReceive.get(0).getRoomName();
             SharedPreferenceTools.putValuetoSP(this, CodeConstants.MEETING_ROOM_NAME,meetingRoomName);
@@ -228,8 +241,21 @@ public class MainActivity extends AppCompatActivity implements CurMeetingCallBac
                 case "update":
                     mqttMeetingListBean = meetingListBeanDao.queryBuilder().where(MqttMeetingListBeanDao.Properties.Id.eq(meetingListReceive.get(0).getId())).build().unique();
                     if (mqttMeetingListBean != null) {
-                        meetingListBeanDao.update(mqttMeetingListBean);
+                        meetingListBeanDao.delete(mqttMeetingListBean);
                     }
+                    mqttMeetingListBean = new MqttMeetingListBean(null,
+                            meetingListReceive.get(0).getId(),
+                            roomNum,
+                            meetingListReceive.get(0).getRoomName(),
+                            meetingListReceive.get(0).getName(),
+                            meetingListReceive.get(0).getIsOpen(),
+                            meetingListReceive.get(0).getEndDate(),
+                            meetingListReceive.get(0).getStartDate(),
+                            meetingListReceive.get(0).getTemplateId(),
+                            meetingListReceive.get(0).getBookPerson(),
+                            meetingListReceive.get(0).getSign())
+                    ;
+                    meetingListBeanDao.insert(mqttMeetingListBean);
                     break;
             }
             meetingListQuery.clear();
@@ -237,6 +263,7 @@ public class MainActivity extends AppCompatActivity implements CurMeetingCallBac
                     .between(dateTimeUtil.transDataToTime(dateTimeUtil.getCurrentDateYYMMDD() + " 00:00:00"), dateTimeUtil.transDataToTime(dateTimeUtil.getCurrentDateYYMMDD() + " 23:59:59")))
                     .orderAsc(MqttMeetingListBeanDao.Properties.EndDate)
                     .build().list());
+            LogUtil.w("===meetingList", "topic:" + topic + ";----meetingListQuery:" + meetingListQuery.toString());
             fragmentCallBackA.TransDataA(topic, meetingListQuery);
             fragmentCallBackB.TransDataB(topic, meetingListQuery);
 
@@ -365,7 +392,6 @@ public class MainActivity extends AppCompatActivity implements CurMeetingCallBac
         fragmentCallBackB = callBack;
     }
 
-
     private class MyViewPagerAdapter extends FragmentPagerAdapter {
         public MyViewPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -487,7 +513,7 @@ public class MainActivity extends AppCompatActivity implements CurMeetingCallBac
     @Override
     protected void onResume() {
         super.onResume();
-
+        inspectNet();
     }
 
     long onclickfirst = 0;
@@ -512,5 +538,99 @@ public class MainActivity extends AppCompatActivity implements CurMeetingCallBac
             }
         }
         return true;
+    }
+    /**
+     * 网络类型
+     */
+    private int netMobile;
+    public boolean inspectNet() {
+        netMobile = NetUtil.getNetWorkState(MainActivity.this);
+        cancleNetTast();
+        if(netMobile == 2){
+            System.out.println("inspectNet：连接以太网（网线）");
+            LogUtil.w("===net","inspectNet：连接以太网（网线）");
+            ToastUtils.showToast(this,"当前网络：以太网");
+        }else if (netMobile == 1) {
+            System.out.println("inspectNet：连接wifi");
+            LogUtil.w("===net","inspectNet：连接wifi");
+            ToastUtils.showToast(this,"当前网络：wifi");
+        } else if (netMobile == 0) {
+            System.out.println("inspectNet:连接移动数据");
+            LogUtil.w("===net","inspectNet：连接移动数据");
+            ToastUtils.showToast(this,"当前网络：数据网络");
+        } else if (netMobile == -1) {
+            System.out.println("inspectNet:当前没有网络");
+            LogUtil.w("===net","inspectNet：当前没有网络");
+            ToastUtils.showToast(this,"网络连接不可用，前检查网络配置");
+
+            checkNetTimer = new Timer();
+            checkNetTask = new CheckNetTask();
+            checkNetTimer.schedule(checkNetTask,0,periodTime);
+        }
+        return isNetConnect();
+    }
+    /**
+     * 判断有无网络 。
+     *
+     * @return true 有网, false 没有网络.
+     */
+    public boolean isNetConnect() {
+        if (netMobile == 1) {
+            LogUtil.w("===net","isNetConnect:连接wifi");
+            return true;
+        } else if (netMobile == 0) {
+            LogUtil.w("===net","isNetConnect:连接移动数据");
+            return true;
+        } else if (netMobile == 2) {
+            LogUtil.w("===net","isNetConnect:连接以太网");
+            return true;
+        }else if (netMobile == -1) {
+            LogUtil.w("===net","isNetConnect:当前没有网络");
+            return false;
+        }
+        return false;
+    }
+    @Override
+    public void onNetChange(int netMobile) {
+        this.netMobile = netMobile;
+        cancleNetTast();
+        if (netMobile == 1) {
+            ToastUtils.showToast(this,"wifi已连接");
+            LogUtil.w("===net","onNetChange:wifi已连接");
+        } else if (netMobile == 0) {
+            ToastUtils.showToast(this,"数据网络已连接");
+            LogUtil.w("===net","onNetChange:数据网络已连接");
+        } else if (netMobile == 2) {
+            ToastUtils.showToast(this,"以太网络已连接");
+            LogUtil.w("===net","onNetChange:以太网络已连接");
+        } else if (netMobile == -1) {
+            LogUtil.w("===net","onNetChange:哎呀，一不小心断网了，前检查网络设置");
+
+            checkNetTimer = new Timer();
+            checkNetTask = new CheckNetTask();
+            checkNetTimer.schedule(checkNetTask,0,periodTime);
+        }
+    }
+
+    private void cancleNetTast() {
+        if (checkNetTask != null) {
+            checkNetTask.cancel();
+            checkNetTask = null;
+        }
+        if (checkNetTimer != null) {
+            checkNetTimer.purge();
+            checkNetTimer.cancel();
+            checkNetTimer = null;
+        }
+    }
+
+
+    class CheckNetTask extends TimerTask {
+        @Override
+        public void run() {
+            Message message = new Message();
+            message.what = 0x3;
+            handler.sendMessage(message);
+        }
     }
 }

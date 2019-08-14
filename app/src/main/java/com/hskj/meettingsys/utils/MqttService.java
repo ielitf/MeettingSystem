@@ -226,7 +226,7 @@ public class MqttService extends Service {
         public void onReceive(Context context, Intent intent) {
             LogUtil.i("===BroadcastReceiver", "Connectivity Changed...");
             if (!isNetworkAvailable()) {
-                Toast.makeText(context, "网络连接不可用，请检查网络", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(context, "网络连接不可用，请检查网络!", Toast.LENGTH_SHORT).show();
 //                scheduler.shutdownNow();//如果当前无网络，调用此方法，此时打开app会崩溃，
             } else {
                 startReconnect();

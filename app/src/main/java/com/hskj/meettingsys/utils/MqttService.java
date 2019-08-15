@@ -98,7 +98,7 @@ public class MqttService extends Service {
         String IP_HOST_NEWS= (String) SharedPreferenceTools.getValueofSP(MqttService.this,"mqttIp","aids.zdhs.com.cn");
 //        IP_HOST_NEWS = SDCardUtils.readTxt(CodeConstants.IP_HOST_NEWS);
         String URL_QUERY = "tcp://" + IP_HOST_NEWS;
-        clientId = roomNum + "_client_id_mp_xiaoyao";
+        clientId = roomNum + "_client_id_mp_";
         TOPIC_MEETING_LIST = roomNum + "_meetList";
         TOPIC_MEETING_CUR = roomNum + "_currtMeet";
         topicFilters = new String[]{TOPIC_MEETING_CUR, TOPIC_MEETING_LIST};

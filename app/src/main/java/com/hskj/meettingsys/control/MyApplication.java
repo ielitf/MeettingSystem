@@ -38,7 +38,7 @@ public class MyApplication extends Application {
 			//首次初始化
 			SharedPreferenceTools.putValuetoSP(getApplicationContext(), "mqttIp", "aids.zdhs.com.cn:1883");
 			SharedPreferenceTools.putValuetoSP(getApplicationContext(), "ServiceIp", "https://aids.zdhs.com.cn");
-			SharedPreferenceTools.putValuetoSP(getApplicationContext(), "DeviceNum", "002");
+			SharedPreferenceTools.putValuetoSP(getApplicationContext(), "DeviceNum", "999");
 			SharePreferenceManager.setIsFirstUse(false);
 		}
 

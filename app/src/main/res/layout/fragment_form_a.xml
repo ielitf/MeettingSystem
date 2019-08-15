@@ -8,6 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:gravity="center_vertical"
         android:visibility="visible"
         >
 
@@ -18,6 +19,16 @@
             android:adjustViewBounds="true"
             android:layout_margin="10dp"
             android:src="@mipmap/huishiicon"
+            />
+        <TextView
+            android:id="@+id/version_tv_a"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:gravity="end"
+            android:text="v_1.011"
+            android:textSize="10sp"
+            android:textColor="@color/white"
             />
     </LinearLayout>
     <View

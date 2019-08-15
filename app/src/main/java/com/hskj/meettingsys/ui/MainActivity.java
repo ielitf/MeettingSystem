@@ -62,7 +62,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity implements CurMeetingCallBack, TodayMeetingCallBack, View.OnClickListener ,NetEvevtListener{
+public class MainActivity extends AppCompatActivity implements CurMeetingCallBack, TodayMeetingCallBack ,NetEvevtListener{
     protected String TAG = getClass().getSimpleName();
     private static FragmentCallBackA fragmentCallBackA;
     private static FragmentCallBackB fragmentCallBackB;
@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements CurMeetingCallBac
         dateTimeUtil = DateTimeUtil.getInstance();
         templateId = SharePreferenceManager.getMeetingMuBanType();//获取存储的磨板类型，默认值：“1”
         getStuDao();
-        initViews();
+        viewPager = findViewById(R.id.viewPager);
         frags.add(aFragment);
         frags.add(bFragment);
         pagerAdapter = new MyViewPagerAdapter(getSupportFragmentManager());
@@ -139,8 +139,7 @@ public class MainActivity extends AppCompatActivity implements CurMeetingCallBac
         for (MqttMeetingListBean user : userList) {
             meetingListBeanDao.delete(user);
         }
-        checkVersion();
-
+        inspectNet();//检查当前网络状态
         MqttService.setCurMeetingCallBack(this);
         MqttService.setTodayMeetingCallBack(this);
         //开启服务
@@ -152,6 +151,13 @@ public class MainActivity extends AppCompatActivity implements CurMeetingCallBac
             LogUtil.i("===服务正在运行", "return");
             return;
         }
+        //定时检查版本更新
+       new Timer().schedule(new TimerTask() {
+           @Override
+           public void run() {
+               checkVersion();
+           }
+       }, 1000 * 60 * 30, 1000 * 60 * 60);
     }
 
     /**
@@ -163,26 +169,6 @@ public class MainActivity extends AppCompatActivity implements CurMeetingCallBac
         daoMaster = new DaoMaster(devOpenHelper.getWritableDb());
         daoSession = daoMaster.newSession();
         meetingListBeanDao = daoSession.getMqttMeetingListBeanDao();
-    }
-
-    private void initViews() {
-        room = findViewById(R.id.room);
-        room.setOnClickListener(this);
-        cur = findViewById(R.id.cur);
-        cur.setOnClickListener(this);
-        today = findViewById(R.id.today);
-        today.setOnClickListener(this);
-        editText = findViewById(R.id.edit_query);
-        editText.setText(SDCardUtils.readTxt("roomName"));
-        viewPager = findViewById(R.id.viewPager);
-
-        news_cur = findViewById(R.id.cur_news);
-        news_today = findViewById(R.id.today_news);
-        news_cur.setOnClickListener(this);
-        news_today.setOnClickListener(this);
-        download = findViewById(R.id.download);
-        download.setOnClickListener(this);
-
     }
 
     @Override
@@ -292,98 +278,6 @@ public class MainActivity extends AppCompatActivity implements CurMeetingCallBac
         return false;
     }
 
-    Boolean ceshi = true;
-    int i = 0;
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.cur_news:
-//                if(ceshi){
-//                    strMessage = "{\"endDate\":1560760200000,\"isOpen\":\"1\",\"meetingId\":576,\"meetingName\":\"zhanghao11\",\"roomName\":\"慧视科技会议室1\",\"startDate\":1560735900000}";
-//                    fragmentCallBackACur.TransDataACur(topic, strMessage);
-//                    fragmentCallBackBCur.TransDataBCur(topic, strMessage);
-//                    ceshi = false;
-//                }else{
-//                    strMessage = "{\"endDate\":1560760200000,\"isOpen\":\"1\",\"meetingId\":576,\"meetingName\":\"zhanghao22\",\"roomName\":\"慧视科技会议室2\",\"startDate\":1560735900000}";
-//                    fragmentCallBackACur.TransDataACur(topic, strMessage);
-//                    fragmentCallBackBCur.TransDataBCur(topic, strMessage);
-//                    ceshi = true;
-//                }
-                break;
-            case R.id.today_news://删除
-//                if(ceshi){
-//                    meetingList.clear();
-//                    strMessage = "[{\"bookPerson\":\"zhanghao11\",\"endDate\":1560743100000,\"id\":581,\"isOpen\":\"1\",\"name\":\"kkkk11\",\"roomName\":\"慧视科技会议室\",\"startDate\":1560742200000,\"templateId\":2},{\"bookPerson\":\"zhangsan11\",\"endDate\":1560744900000,\"id\":583,\"isOpen\":\"1\",\"name\":\"1231111\",\"roomName\":\"慧视科技会议室\",\"startDate\":1560744000000,\"templateId\":2}]";
-//                    meetingList.addAll(JSON.parseArray(strMessage, MqttMeetingListBean.class));
-//                    fragmentCallBackA.TransDataA("001_meetList", meetingList);
-//                    fragmentCallBackB.TransDataB("001_meetList", meetingList);
-//                    ceshi = false;
-//                }else{
-//                    meetingList.clear();
-//                    strMessage = "[{\"bookPerson\":\"zhanghao22\",\"endDate\":1560743100000,\"id\":581,\"isOpen\":\"1\",\"name\":\"kkkk22\",\"roomName\":\"慧视科技会议室\",\"startDate\":1560742200000,\"templateId\":2},{\"bookPerson\":\"zhangsan22\",\"endDate\":1560744900000,\"id\":583,\"isOpen\":\"1\",\"name\":\"1232222\",\"roomName\":\"慧视科技会议室\",\"startDate\":1560744000000,\"templateId\":2}]";
-//                    meetingList.addAll(JSON.parseArray(strMessage, MqttMeetingListBean.class));
-//                    fragmentCallBackA.TransDataA("001_meetList", meetingList);
-//                    fragmentCallBackB.TransDataB("001_meetList", meetingList);
-//                    ceshi = true;
-//                }
-                List<MqttMeetingListBean> userList = meetingListBeanDao.queryBuilder().where(MqttMeetingListBeanDao.Properties.StartDate.lt(System.currentTimeMillis())).build().list();
-                for (MqttMeetingListBean user : userList) {
-                    meetingListBeanDao.delete(user);
-                }
-                break;
-            case R.id.room:
-                Toast.makeText(this, "会议室编号切换为：" + editText.getText(), Toast.LENGTH_SHORT).show();
-                SharedPreferenceTools.putValuetoSP(MainActivity.this, "DeviceNum", "");
-                MqttService.TOPIC_MEETING_LIST = editText.getText() + "_meetList";
-                MqttService.TOPIC_MEETING_CUR = editText.getText() + "_currtMeet";
-                break;
-            case R.id.cur://查询
-                List<MqttMeetingListBean> list = meetingListBeanDao.queryBuilder()
-//                        .where(MqttMeetingListBeanDao.Properties.StartDate
-////                        .eq(DateTimeUtil.getInstance().getCurrentDateMMDD()))
-//                        .eq("06-27"))
-                        .orderAsc(MqttMeetingListBeanDao.Properties.EndDate)
-                        .build().list();
-
-                for (int i = 0; i < list.size(); i++) {
-                    Log.d("====", "query: " + list.get(i).toString());
-                }
-                break;
-            case R.id.today://插入
-                try {
-                    mqttMeetingListBean = new MqttMeetingListBean(null,
-                            ++i,
-                            roomNum,
-                            "会议室" + i,
-                            "主题" + i,
-                            "1",
-                            System.currentTimeMillis(),
-                            System.currentTimeMillis(),
-                            2,
-                            "张三" + i,
-                            "insert");
-                    meetingListBeanDao.insert(mqttMeetingListBean);
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    LogUtil.w("===Exception", "插入失败" + e.getMessage());
-                }
-                break;
-            case R.id.download:
-                loadFile(appUrl);
-                break;
-        }
-        //MqttMeetingListBeanDao.Properties.RoomNum.eq(roomNum)
-        meetingListQuery.clear();
-        meetingListQuery.addAll(meetingListBeanDao.queryBuilder().where(MqttMeetingListBeanDao.Properties.RoomNum.eq(roomNum), MqttMeetingListBeanDao.Properties.StartDate
-                .between(dateTimeUtil.transDataToTime(dateTimeUtil.getCurrentDateYYMMDD() + " 00:00:00"), dateTimeUtil.transDataToTime(dateTimeUtil.getCurrentDateYYMMDD() + " 23:59:59")))
-                .orderAsc(MqttMeetingListBeanDao.Properties.EndDate)
-                .build().list());
-        fragmentCallBackA.TransDataA(MqttService.TOPIC_MEETING_LIST, meetingListQuery);
-        fragmentCallBackB.TransDataB(MqttService.TOPIC_MEETING_LIST, meetingListQuery);
-    }
-
     public static void setFragmentCallBackA(FragmentCallBackA callBack) {
         fragmentCallBackA = callBack;
     }
@@ -451,9 +345,8 @@ public class MainActivity extends AppCompatActivity implements CurMeetingCallBac
     }
 
     public void checkVersion() {
-        versionCodeLocal = Utils.getVersionCode(MainActivity.this);
-        ToastUtils.showToast(MainActivity.this, "当前版本：" + versionCodeLocal);
-        LogUtil.d("===", "开始检查版本更新");
+        versionCodeLocal = Utils.getVersionCode(this);
+        LogUtil.d("===", "当前版本："+versionCodeLocal+"开始检查版本更新");
 //        OkGo.<String>get("http://192.168.10.120:8080/app/uploadVersionInfo")
         OkGo.<String>get(RequestApi.getUpdataAppUrl())
                 .execute(new StringCallback() {
@@ -513,7 +406,6 @@ public class MainActivity extends AppCompatActivity implements CurMeetingCallBac
     @Override
     protected void onResume() {
         super.onResume();
-        inspectNet();
     }
 
     long onclickfirst = 0;
@@ -547,22 +439,16 @@ public class MainActivity extends AppCompatActivity implements CurMeetingCallBac
         netMobile = NetUtil.getNetWorkState(MainActivity.this);
         cancleNetTast();
         if(netMobile == 2){
-            System.out.println("inspectNet：连接以太网（网线）");
-            LogUtil.w("===net","inspectNet：连接以太网（网线）");
             ToastUtils.showToast(this,"当前网络：以太网");
+            checkVersion();
         }else if (netMobile == 1) {
-            System.out.println("inspectNet：连接wifi");
-            LogUtil.w("===net","inspectNet：连接wifi");
             ToastUtils.showToast(this,"当前网络：wifi");
+            checkVersion();
         } else if (netMobile == 0) {
-            System.out.println("inspectNet:连接移动数据");
-            LogUtil.w("===net","inspectNet：连接移动数据");
             ToastUtils.showToast(this,"当前网络：数据网络");
+            checkVersion();
         } else if (netMobile == -1) {
-            System.out.println("inspectNet:当前没有网络");
-            LogUtil.w("===net","inspectNet：当前没有网络");
             ToastUtils.showToast(this,"网络连接不可用，前检查网络配置");
-
             checkNetTimer = new Timer();
             checkNetTask = new CheckNetTask();
             checkNetTimer.schedule(checkNetTask,0,periodTime);
@@ -576,16 +462,12 @@ public class MainActivity extends AppCompatActivity implements CurMeetingCallBac
      */
     public boolean isNetConnect() {
         if (netMobile == 1) {
-            LogUtil.w("===net","isNetConnect:连接wifi");
             return true;
         } else if (netMobile == 0) {
-            LogUtil.w("===net","isNetConnect:连接移动数据");
             return true;
         } else if (netMobile == 2) {
-            LogUtil.w("===net","isNetConnect:连接以太网");
             return true;
         }else if (netMobile == -1) {
-            LogUtil.w("===net","isNetConnect:当前没有网络");
             return false;
         }
         return false;
@@ -596,16 +478,14 @@ public class MainActivity extends AppCompatActivity implements CurMeetingCallBac
         cancleNetTast();
         if (netMobile == 1) {
             ToastUtils.showToast(this,"wifi已连接");
-            LogUtil.w("===net","onNetChange:wifi已连接");
+            checkVersion();
         } else if (netMobile == 0) {
             ToastUtils.showToast(this,"数据网络已连接");
-            LogUtil.w("===net","onNetChange:数据网络已连接");
+            checkVersion();
         } else if (netMobile == 2) {
             ToastUtils.showToast(this,"以太网络已连接");
-            LogUtil.w("===net","onNetChange:以太网络已连接");
+            checkVersion();
         } else if (netMobile == -1) {
-            LogUtil.w("===net","onNetChange:哎呀，一不小心断网了，前检查网络设置");
-
             checkNetTimer = new Timer();
             checkNetTask = new CheckNetTask();
             checkNetTimer.schedule(checkNetTask,0,periodTime);
@@ -623,7 +503,6 @@ public class MainActivity extends AppCompatActivity implements CurMeetingCallBac
             checkNetTimer = null;
         }
     }
-
 
     class CheckNetTask extends TimerTask {
         @Override

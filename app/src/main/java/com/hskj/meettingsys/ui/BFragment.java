@@ -38,6 +38,7 @@ import com.hskj.meettingsys.utils.IPAddressUtils;
 import com.hskj.meettingsys.utils.LogUtil;
 import com.hskj.meettingsys.utils.MqttService;
 import com.hskj.meettingsys.utils.SharedPreferenceTools;
+import com.hskj.meettingsys.utils.Utils;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
 
@@ -62,7 +63,7 @@ public class BFragment extends Fragment implements FragmentCallBackB , DataBaseQ
     private List<MqttMeetingListBean> myMeetingList = new ArrayList<>();
     private List<MqttMeetingCurrentBean> myCurMeetingList = new ArrayList<>();
     private MeetingAdapter adapter = null;
-    private TextView timeTv, dataTv, roomName, meetingName, meetingTime, meeting_bumen, room_num;
+    private TextView timeTv, dataTv, roomName, meetingName, meetingTime, meeting_bumen, room_num,versionTV;
     private DateTimeUtil dateTimeUtil;
     private long delayTime = 3000;//listView列表比较多时，自动滚动的时间间隔
     private long weathetUpdataTime = 3600 * 1000;//天气定时更新
@@ -230,7 +231,7 @@ public class BFragment extends Fragment implements FragmentCallBackB , DataBaseQ
                 //更新天气
                 loadWeatherData();
             }
-        }, 60, 60 * 1000 * 60 * 2);
+        }, 60, 60 * 1000 * 15);
     }
 
     private void loadWeatherData() {
@@ -284,7 +285,7 @@ public class BFragment extends Fragment implements FragmentCallBackB , DataBaseQ
      */
     @Override
     public void onDataBaseQueryListenerB(String roomNum) {
-        room_num.setText("当前会议室编号：" + roomNum);
+        room_num.setText("会议室编号：" + roomNum);
         //设置当前会议
         if (checkCurMeetingTask != null) {
             checkCurMeetingTask.cancel();
@@ -348,6 +349,8 @@ public class BFragment extends Fragment implements FragmentCallBackB , DataBaseQ
         meetingTime = view.findViewById(R.id.current_meeting_time_b);
         meeting_bumen = view.findViewById(R.id.current_meeting_bm_b);
         gridView = view.findViewById(R.id.weather_b);
+        versionTV = view.findViewById(R.id.version_tv_b);
+        versionTV.setText("v_" + Utils.getAppVersionName(context));
     }
 
     private void initWeatherData() {

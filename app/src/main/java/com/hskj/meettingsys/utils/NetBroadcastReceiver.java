@@ -6,15 +6,13 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 
 import com.hskj.meettingsys.listener.NetEvevtListener;
-import com.hskj.meettingsys.ui.MainActivity;
-
 
 /**
  * 自定义检查手机网络状态是否切换的广播接受器
  */
 
 public class NetBroadcastReceiver extends BroadcastReceiver {
-    public NetEvevtListener netEvevtListener = MainActivity.netEvevtListener;
+    public static NetEvevtListener netEvevtListener = null;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -22,7 +20,13 @@ public class NetBroadcastReceiver extends BroadcastReceiver {
         if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
             int netWorkState = NetUtil.getNetWorkState(context);
             // 接口回调传过去状态的类型
-            netEvevtListener.onNetChange(netWorkState);
+            LogUtil.d("===netEvevtListener:",netEvevtListener+"");
+            if(netEvevtListener != null){
+                netEvevtListener.onNetChange(netWorkState);
+            }
         }
+    }
+    public static void setNetEvevtListener(NetEvevtListener listener){
+        netEvevtListener = listener;
     }
 }

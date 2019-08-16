@@ -39,6 +39,7 @@ import com.hskj.meettingsys.utils.ApkUtils;
 import com.hskj.meettingsys.utils.DateTimeUtil;
 import com.hskj.meettingsys.utils.LogUtil;
 import com.hskj.meettingsys.utils.MqttService;
+import com.hskj.meettingsys.utils.NetBroadcastReceiver;
 import com.hskj.meettingsys.utils.NetUtil;
 import com.hskj.meettingsys.utils.RequestApi;
 import com.hskj.meettingsys.utils.SDCardUtils;
@@ -87,10 +88,9 @@ public class MainActivity extends AppCompatActivity implements CurMeetingCallBac
     private DaoSession daoSession;
     private MqttMeetingListBeanDao meetingListBeanDao;
     private MqttMeetingListBean mqttMeetingListBean;
-    public static NetEvevtListener netEvevtListener;
     private Timer checkNetTimer;
     private CheckNetTask checkNetTask;
-    private long periodTime = 1000*5;
+    private long periodTime = 1000*8;//8s
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements CurMeetingCallBac
                     viewPager.setCurrentItem(1);
                     break;
                 case 0x3:
-                    ToastUtils.showToast(MainActivity.this,"网络连接不可用，前检查网络配置");
+                    Toast.makeText(MainActivity.this,"网络连接不可用，请检查网络配置",Toast.LENGTH_LONG).show();
                     break;
             }
         }
@@ -118,7 +118,6 @@ public class MainActivity extends AppCompatActivity implements CurMeetingCallBac
         // 去除标题栏
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
-        netEvevtListener = this;
         dateTimeUtil = DateTimeUtil.getInstance();
         templateId = SharePreferenceManager.getMeetingMuBanType();//获取存储的磨板类型，默认值：“1”
         getStuDao();
@@ -140,6 +139,7 @@ public class MainActivity extends AppCompatActivity implements CurMeetingCallBac
             meetingListBeanDao.delete(user);
         }
         inspectNet();//检查当前网络状态
+        NetBroadcastReceiver.setNetEvevtListener(this);
         MqttService.setCurMeetingCallBack(this);
         MqttService.setTodayMeetingCallBack(this);
         //开启服务
@@ -448,7 +448,6 @@ public class MainActivity extends AppCompatActivity implements CurMeetingCallBac
             ToastUtils.showToast(this,"当前网络：数据网络");
             checkVersion();
         } else if (netMobile == -1) {
-            ToastUtils.showToast(this,"网络连接不可用，前检查网络配置");
             checkNetTimer = new Timer();
             checkNetTask = new CheckNetTask();
             checkNetTimer.schedule(checkNetTask,0,periodTime);

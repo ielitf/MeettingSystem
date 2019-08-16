@@ -200,8 +200,6 @@ public class AFragment extends Fragment implements FragmentCallBackA , DataBaseQ
                 }
             }
         });
-//        initData();
-//        initWeatherData();
         LogUtil.d("===", "模板A准备就绪");
         inintData();//从数据库中查询今日会议数据，并更新天气
         return convertView;
@@ -266,17 +264,6 @@ public class AFragment extends Fragment implements FragmentCallBackA , DataBaseQ
                         }
                     }
                 });
-    }
-
-    /**
-     * 添加假数据
-     */
-    private void initData() {
-        for (int i = 0; i < MeetingData.meeting_title.length; i++) {
-            jiaMeetingList.add(new MeetingItemBean(MeetingData.meeting_data_day[i], MeetingData.meeting_data_hour[i], MeetingData.meeting_title[i], MeetingData.meeting_order[i]));
-        }
-        jiaAdapter = new MeetingAdapterA(context, jiaMeetingList);
-        meeting_listView.setAdapter(jiaAdapter);
     }
 
     /**

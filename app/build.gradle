@@ -7,8 +7,8 @@ android {
         applicationId "com.hskj.meettingsys"
         minSdkVersion 17
         targetSdkVersion 28
-        versionCode 24
-        versionName "1.024"
+        versionCode 25
+        versionName "1.025"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

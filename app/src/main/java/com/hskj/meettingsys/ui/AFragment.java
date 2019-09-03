@@ -238,7 +238,7 @@ public class AFragment extends Fragment implements FragmentCallBackA , DataBaseQ
         OkGo.<String>get("http://api.k780.com:88/?")
                 .params("app", "weather.future")
 //                .params("weaid", ip)
-                .params("weaid", 2277)//涞水
+                .params("weaid", 1)//涞水2277,北京1
                 .params("appkey", K780Utils.APPKEY)
                 .params("sign", K780Utils.SIGN)
                 .params("format", "json")

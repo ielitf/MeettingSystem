@@ -212,6 +212,7 @@ public class MqttService extends Service {
             @Override
             public void run() {
                 if (!mqttClient.isConnected() && isNetworkAvailable()) {
+                    LogUtil.i("===startReconnect", "开始连接");
                     connect();
                 }
             }
